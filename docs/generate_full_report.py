@@ -132,6 +132,10 @@ def build_report():
         table.alignment = WD_TABLE_ALIGNMENT.CENTER
         
         # Header Row
+        hdr_trPr = table.rows[0]._tr.get_or_add_trPr()
+        hdr_trPr.append(parse_xml(f'<w:tblHeader {nsdecls("w")}/>'))
+        hdr_trPr.append(parse_xml(f'<w:cantSplit {nsdecls("w")}/>'))
+
         hdr_cells = table.rows[0].cells
         for i, header_text in enumerate(headers):
             hdr_cells[i].text = header_text
@@ -153,7 +157,10 @@ def build_report():
 
         # Data Rows
         for r_idx, row_values in enumerate(data):
-            row_cells = table.add_row().cells
+            row = table.add_row()
+            row_trPr = row._tr.get_or_add_trPr()
+            row_trPr.append(parse_xml(f'<w:cantSplit {nsdecls("w")}/>'))
+            row_cells = row.cells
             for c_idx, val in enumerate(row_values):
                 row_cells[c_idx].text = str(val)
                 set_cell_margins(row_cells[c_idx], top=100, bottom=100, left=140, right=140)
@@ -393,9 +400,9 @@ def build_report():
         ["5", "Association for Computational Linguistics (ACL)", "J. Li, M. Ott, C. Cardie & E. Hovy (2014)",
          "Examined whether deceptive opinion spam can be identified using generalizable linguistic patterns across domains.",
          "Focused on deceptive text classification; does not provide live product-rating deflation or hardware aspect diagnostics."],
-        ["6", "RV University School of CSE (Current Project)", "Aryan Kulkarni, Aryan Jha, Ashifraj Gaddi, Ata Us Faizaan (2025–26)",
-         "Synthesized dual-channel TF-IDF with Balanced Logistic Regression, an automated star rating deflator, and a 6-aspect hardware failure diagnostic engine.",
-         "Bridges the research gap by coupling high-speed text classification (75.82% accuracy) with real-time URL auditing and consumer failure diagnostics."]
+        ["6", "ACM International Conference on World Wide Web (WWW)", "A. Mukherjee, B. Liu & N. Glance (2012)",
+         "Modeled deceptive reviewer groups in commercial forums; proved collective collusion patterns across temporal audit windows.",
+         "Focused on user group graph clustering; did not develop text-based rating deflation or hardware aspect diagnostics."]
     ]
     create_styled_table(lit_widths, lit_headers, lit_data,
                         align_cols=[WD_ALIGN_PARAGRAPH.CENTER, WD_ALIGN_PARAGRAPH.LEFT, WD_ALIGN_PARAGRAPH.LEFT, WD_ALIGN_PARAGRAPH.LEFT, WD_ALIGN_PARAGRAPH.LEFT])
@@ -631,7 +638,8 @@ def build_report():
         ("[5]", "J. Li, M. Ott, C. Cardie, and E. Hovy, \"Towards a general rule for identifying deceptive opinion spam,\" in Proc. 52nd Annual Meeting of the Association for Computational Linguistics (ACL), 2014, pp. 1566–1576."),
         ("[6]", "F. Pedregosa et al., \"Scikit-learn: Machine learning in Python,\" Journal of Machine Learning Research, vol. 12, pp. 2825–2830, 2011."),
         ("[7]", "A. Géron, Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow, 3rd ed. Sebastopol, CA, USA: O'Reilly Media, 2022."),
-        ("[8]", "C. M. Bishop, Pattern Recognition and Machine Learning. New York, NY, USA: Springer, 2006.")
+        ("[8]", "C. M. Bishop, Pattern Recognition and Machine Learning. New York, NY, USA: Springer, 2006."),
+        ("[9]", "A. Mukherjee, B. Liu, and N. Glance, \"Spotting fake reviewer groups in consumer reviews,\" in Proc. 21st Int. Conf. on World Wide Web (WWW), 2012, pp. 191–200.")
     ]
     for pfx, ref_body in refs:
         add_list_item(pfx, ref_body, bold_prefix=True, space_after=4, indent=0.3)
@@ -707,10 +715,15 @@ def build_report():
     doc.save(out_docs)
     print("Clean DOCX generated successfully at:", out_docs)
 
-    # Also copy directly to Desktop
+    # Also copy directly to Desktop (handle case where user has file currently open in Word)
     out_desktop = r"C:\Users\venka\Desktop\CS2227_AIML_Project_Report_TrustRate_AI.docx"
-    doc.save(out_desktop)
-    print("Clean DOCX copied successfully to Desktop:", out_desktop)
+    try:
+        doc.save(out_desktop)
+        print("Clean DOCX copied successfully to Desktop:", out_desktop)
+    except PermissionError:
+        out_desktop_v2 = r"C:\Users\venka\Desktop\CS2227_AIML_Project_Report_TrustRate_AI_Updated.docx"
+        doc.save(out_desktop_v2)
+        print("Original Desktop file is open in Word. Saved updated file to:", out_desktop_v2)
 
 if __name__ == '__main__':
     build_report()

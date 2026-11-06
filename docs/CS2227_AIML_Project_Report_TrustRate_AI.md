@@ -112,7 +112,7 @@ A systematic survey of prior research in opinion spam detection, rating distorti
 | 3 | Assoc. for Computational Linguistics (ACL) | M. Ott et al. (2011) | Demonstrated that automated text classification using n-grams and psychological deception cues outperforms human judges in detecting fabricated reviews. | Evaluated synthetic crowdsourced reviews in hotel domains rather than real-world e-commerce electronics corpora. |
 | 4 | Expert Systems with Applications (Elsevier) | S. Rayana & L. Akoglu (2015) | Developed collective classification framework combining behavioral metadata with text to score review honesty and compute ranking adjustments. | High computational complexity; does not provide plain-English product breakdown diagnostics for shoppers. |
 | 5 | Association for Computational Linguistics (ACL) | J. Li, M. Ott, C. Cardie & E. Hovy (2014) | Examined whether deceptive opinion spam can be identified using generalizable linguistic patterns across domains. | Focused on deceptive text classification; does not provide live product-rating deflation or hardware aspect diagnostics. |
-| 6 | RV University School of CSE (Current Project) | Aryan Kulkarni, Aryan Jha, Ashifraj Gaddi, Ata Us Faizaan (2025–26) | Synthesized dual-channel TF-IDF with Balanced Logistic Regression, an automated star rating deflator, and a 6-aspect hardware failure diagnostic engine. | Bridges the research gap by coupling high-speed text classification (75.82% accuracy) with real-time URL auditing and consumer failure diagnostics. |
+| 6 | ACM International Conference on World Wide Web (WWW) | A. Mukherjee, B. Liu & N. Glance (2012) | Modeled deceptive reviewer groups in commercial forums; proved collective collusion patterns across temporal audit windows. | Focused on user group graph clustering; did not develop text-based rating deflation or hardware aspect diagnostics. |
 
 *Table 5.1: Comparative Literature Review Summary*
 
@@ -310,6 +310,8 @@ Future iterations of TrustRate AI can expand along several promising technical d
 [7] A. Géron, Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow, 3rd ed. Sebastopol, CA, USA: O'Reilly Media, 2022.
 
 [8] C. M. Bishop, Pattern Recognition and Machine Learning. New York, NY, USA: Springer, 2006.
+
+[9] A. Mukherjee, B. Liu, and N. Glance, "Spotting fake reviewer groups in consumer reviews," in Proc. 21st Int. Conf. on World Wide Web (WWW), 2012, pp. 191–200.
 
 ## 17. Appendix
 
