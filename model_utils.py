@@ -23,11 +23,13 @@ SUSPICIOUS_TRIGGER_WORDS = [
 ]
 
 GENUINE_EXPERIENCE_WORDS = [
-    "months", "returned", "broke", "disappointed", "complaint", "battery lasted",
-    "after a week", "customer service", "replacement", "pros and cons",
-    "honest review", "daily use", "durability", "wear and tear", "setup",
-    "sound quality", "cable length", "noise cancellation", "build quality",
-    "disconnects", "pairing was easy"
+    "months", "month", "returned", "broke", "disappointed", "complaint", "battery lasted",
+    "battery life", "battery backup", "after a week", "customer service", "replacement",
+    "pros and cons", "honest review", "daily use", "daily usage", "daily work", "office work",
+    "durability", "wear and tear", "setup", "sound quality", "cable length", "noise cancellation",
+    "build quality", "disconnects", "pairing was easy", "viewing angles", "multitasking",
+    "for the price", "value for money", "verified purchase", "normal use", "lightweight",
+    "slim", "fast charging", "everyday use"
 ]
 
 def analyze_review_text(text, rating=None, model=None):
@@ -83,11 +85,20 @@ def analyze_review_text(text, rating=None, model=None):
         bonus += 0.15
         flags.append("Extreme 5-star rating with brief generic praise")
         
-    # Genuine attenuation: if realistic usage words are present, lower suspicious score
-    if len(genuine_markers) >= 2:
-        bonus -= 0.15
-    elif len(genuine_markers) == 1:
-        bonus -= 0.08
+    # Genuine attenuation: if realistic usage words are present and no deceptive triggers found
+    if len(triggers_found) == 0:
+        if len(genuine_markers) >= 2:
+            bonus -= 0.32
+        elif len(genuine_markers) == 1:
+            bonus -= 0.22
+        elif word_count >= 12 and excl_count <= 1 and caps_ratio < 10:
+            # Descriptive natural review without promo triggers
+            bonus -= 0.15
+    else:
+        if len(genuine_markers) >= 2:
+            bonus -= 0.10
+        elif len(genuine_markers) == 1:
+            bonus -= 0.05
         
     final_prob = min(0.99, max(0.01, round(prob + bonus, 4)))
     label = "suspicious" if final_prob >= 0.50 else "genuine"

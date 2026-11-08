@@ -498,187 +498,259 @@ st.sidebar.info(
 
 
 # ---------------------------------------------------------------------------
-# Mode 1: 🌐 Live E-Commerce URL Auditor
+# Mode 1: 🌐 Live E-Commerce URL Auditor & Direct Review Audit
 # ---------------------------------------------------------------------------
 if nav_choice == "🌐 Live E-Commerce URL Auditor":
     st.subheader("🌐 E-Commerce Product URL Audit & Rating Deflator")
-    st.caption("Paste any Amazon or e-commerce product link. Versight matches the product or extracts reviews, runs them through the trained ML classifier to filter fake/incentivized reviews, reveals the true authentic rating, and diagnoses why the product fails.")
+    st.caption("Audit e-commerce products by pasting an Amazon URL/ASIN or by pasting customer reviews directly. Versight runs them through trained ML forensics to filter fake/incentivized reviews, reveals true authentic ratings, and diagnoses why products fail.")
 
-    st.markdown("**⚡ Quick Benchmark Presets:**")
-    ex_c1, ex_c2, ex_c3, ex_c4, ex_c5 = st.columns(5)
-    
-    selected_url = ""
-    if ex_c1.button("📱 iPhone 16\n(4.5★ -> 3.8★)", use_container_width=True):
-        selected_url = "https://www.amazon.in/Apple-iPhone-16-128-GB/dp/B0DGJ9B589"
-    if ex_c2.button("🎧 Earbuds\n(4.5★ -> 3.8★)", use_container_width=True):
-        selected_url = "https://www.amazon.com/dp/P001"
-    if ex_c3.button("⚡ 18W Fast Charger\n(4.3★ -> 1.8★)", use_container_width=True):
-        selected_url = "https://www.amazon.com/dp/B0836QVLD3"
-    if ex_c4.button("🔊 BT Speaker\n(4.2★ -> 1.9★)", use_container_width=True):
-        selected_url = "https://www.amazon.com/dp/B07Z8ZWQYV"
-    if ex_c5.button("📱 Galaxy Z Fold\n(4.0★ -> 3.4★)", use_container_width=True):
-        selected_url = "https://www.amazon.com/dp/B0FDL5T1PF"
+    tab_url, tab_paste = st.tabs(["🌐 Audit by Amazon Product URL or ASIN", "📝 Direct Review Paste & Live Audit"])
 
-    url_input = st.text_input(
-        "Enter Amazon Product URL or ASIN:",
-        value=selected_url if selected_url else "",
-        placeholder="Paste any Amazon product link or ASIN (e.g. https://www.amazon.in/dp/...)"
-    )
+    reviews_to_analyze = None
+    product_title_to_show = ""
+    source_to_show = ""
+    asin_to_show = ""
+    displayed_rating_to_show = 4.5
 
-    run_audit = st.button("🚀 Audit Product URL & Diagnose", type="primary")
+    with tab_url:
+        st.markdown("**⚡ Quick Benchmark Presets:**")
+        ex_c1, ex_c2, ex_c3, ex_c4, ex_c5 = st.columns(5)
+        
+        selected_url = ""
+        if ex_c1.button("📱 iPhone 16\n(4.5★ -> 3.8★)", use_container_width=True):
+            selected_url = "https://www.amazon.in/Apple-iPhone-16-128-GB/dp/B0DGJ9B589"
+        if ex_c2.button("💻 Galaxy Book4\n(4.4★ -> 4.0★)", use_container_width=True):
+            selected_url = "https://www.amazon.in/Samsung-Galaxy-Book4-15-6-inch-NP750XGJ-LG1IN/dp/B0D5B5R71Y"
+        if ex_c3.button("🎧 Earbuds\n(4.5★ -> 3.8★)", use_container_width=True):
+            selected_url = "https://www.amazon.com/dp/P001"
+        if ex_c4.button("⚡ Fast Charger\n(4.3★ -> 1.8★)", use_container_width=True):
+            selected_url = "https://www.amazon.com/dp/B0836QVLD3"
+        if ex_c5.button("🔊 BT Speaker\n(4.2★ -> 1.9★)", use_container_width=True):
+            selected_url = "https://www.amazon.com/dp/B07Z8ZWQYV"
 
-    target_to_audit = url_input.strip() if url_input.strip() else selected_url
+        url_input = st.text_input(
+            "Enter Amazon Product URL or ASIN:",
+            value=selected_url if selected_url else "",
+            placeholder="Paste any Amazon product link or ASIN (e.g. https://www.amazon.in/dp/...)",
+            key="url_input_box"
+        )
 
-    if run_audit or selected_url:
-        if not target_to_audit:
-            st.warning("⚠️ Please enter or paste an Amazon product URL or ASIN above to start the audit.")
-        else:
-            with st.spinner("Retrieving customer reviews and running forensic NLP models..."):
-                extracted = fetch_product_reviews_from_url(target_to_audit, catalog_list=catalog)
+        run_url_audit = st.button("🚀 Audit Product URL & Diagnose", type="primary", key="btn_run_url_audit")
+        target_to_audit = url_input.strip() if url_input.strip() else selected_url
 
-        if extracted.get("status") == "captcha_blocked":
-            st.warning("🔒 **Amazon Bot Protection Active:** Amazon returned an anti-bot CAPTCHA for this request.")
-            st.info("Try testing one of the indexed real Amazon product ASINs (like `B0836QVLD3`, `B07Z8ZWQYV`, `B07Q34ZKLF`).")
-        else:
-            product_title = extracted["product_title"]
-            source = extracted["source"]
-            asin_found = extracted["asin"]
-            displayed_rating = extracted.get("displayed_rating")
-            reviews_list = extracted.get("reviews", [])
-
-            if not reviews_list:
-                st.warning("No reviews could be parsed from this product URL.")
+        if run_url_audit or selected_url:
+            if not target_to_audit:
+                st.warning("⚠️ Please enter or paste an Amazon product URL or ASIN above to start the audit.")
             else:
-                rev_df = pd.DataFrame(reviews_list)
-                analysis = compute_rating_inflation(
-                    rev_df,
-                    rating_col="rating",
-                    text_col="review_text",
-                    model=model,
-                    target_displayed_rating=displayed_rating
+                with st.spinner("Retrieving customer reviews and running forensic NLP models..."):
+                    extracted = fetch_product_reviews_from_url(target_to_audit, catalog_list=catalog)
+
+                if extracted.get("status") == "captcha_blocked":
+                    st.warning("🔒 **Amazon Bot Protection Active:** Amazon returned an anti-bot CAPTCHA for this request.")
+                    st.info("💡 You can use the **📝 Direct Review Paste & Live Audit** tab to paste actual customer reviews copied from Amazon!")
+                else:
+                    reviews_list = extracted.get("reviews", [])
+                    if not reviews_list:
+                        st.warning("No reviews could be parsed from this product URL.")
+                    else:
+                        reviews_to_analyze = pd.DataFrame(reviews_list)
+                        product_title_to_show = extracted["product_title"]
+                        source_to_show = extracted["source"]
+                        asin_to_show = extracted["asin"]
+                        displayed_rating_to_show = extracted.get("displayed_rating")
+
+    with tab_paste:
+        st.markdown("#### 📝 Direct Review Paste & Live Audit Engine")
+        st.caption("Paste customer reviews directly from Amazon India, Amazon US, or Flipkart. Versight filters fake and incentivized reviews, calculates rating deflation, extracts Authentic Pros and Cons, and diagnoses hardware failure modes.")
+
+        col_load, _ = st.columns([2, 1])
+        with col_load:
+            if st.button("📋 Load Real Amazon India Reviews (Samsung Galaxy Book4)", help="Pre-populates actual verified reviews from Amazon India"):
+                st.session_state["pasted_title"] = "Samsung Galaxy Book4 (15.6-inch Core i5, Gray)"
+                st.session_state["pasted_store_rating"] = 4.4
+                st.session_state["pasted_reviews_text"] = (
+                    "5.0 | The laptop is slim, lightweight, and easy to carry around. Fast charging is a big advantage and helps reduce downtime during work. After more than a month of daily usage, including browsing, office work, video calls, media consumption, and light multitasking, the performance has been smooth and reliable. The build quality feels premium for the price range, and the overall user experience has been good.\n\n"
+                    "5.0 | value for money product, good battery life, fast charging ,good display definetly go for it amazing laptop\n\n"
+                    "4.0 | Crisp 1080p anti-glare screen with good viewing angles. Connectivity over Wi-Fi 6 and Bluetooth is rock solid.\n\n"
+                    "3.0 | Cooling fans spin up noticeably loud under heavy multitasking or gaming, and the underside gets warm near the hinge.\n\n"
+                    "2.0 | Trackpad click mechanism feels stiff and customer service was unresponsive for warranty support.\n\n"
+                    "5.0 | Unbelievably perfect laptop! Best computer on earth, everyone must buy now five stars! Exceeded all expectations!"
                 )
 
-                st.divider()
-                st.markdown(f"### 📦 {product_title}")
-                st.markdown(f"<span class='url-badge'>Source: {source}</span> &nbsp; <span class='url-badge'>ASIN: {asin_found}</span> &nbsp; <span class='url-badge'>{analysis['total_reviews']} Real Reviews Audited</span>", unsafe_allow_html=True)
-                st.write("")
+        col_p1, col_p2 = st.columns([3, 1])
+        with col_p1:
+            pasted_title_val = st.text_input("Product Title:", value=st.session_state.get("pasted_title", "Samsung Galaxy Book4"), key="paste_title_field")
+        with col_p2:
+            pasted_rating_val = st.number_input("Advertised Store Rating (★):", min_value=1.0, max_value=5.0, value=float(st.session_state.get("pasted_store_rating", 4.4)), step=0.1, key="paste_rating_field")
 
-                # 4 Hero Metric Cards
-                c1, c2, c3, c4 = st.columns(4)
-                with c1:
-                    st.markdown(f"""
-                    <div class="stat-card">
-                        <div class="stat-card-title">Advertised Given Rating</div>
-                        <div class="stat-card-value" style="color: #60a5fa;">{analysis['displayed_rating']:.2f} ★</div>
-                        <div class="stat-card-delta">Listed on online store</div>
-                    </div>
-                    """, unsafe_allow_html=True)
+        pasted_text = st.text_area(
+            "Customer Reviews (Separate reviews by blank lines; optional prefix `Stars | Review Text`):",
+            value=st.session_state.get("pasted_reviews_text", ""),
+            height=200,
+            placeholder="5.0 | The laptop is slim, lightweight, and easy to carry around...\n\n4.0 | Good battery life and crisp display...\n\n2.0 | Cooling fans get loud under load and trackpad is stiff...\n\n5.0 | Miracle machine everyone buy now five stars!",
+            key="paste_text_field"
+        )
 
-                with c2:
-                    st.markdown(f"""
-                    <div class="stat-card">
-                        <div class="stat-card-title">Actual Genuine Rating</div>
-                        <div class="stat-card-value" style="color: #34d399;">{analysis['authentic_rating']:.2f} ★</div>
-                        <div class="stat-card-delta" style="color: #34d399;">Calculated from verified organic reviews</div>
-                    </div>
-                    """, unsafe_allow_html=True)
+        run_paste_audit = st.button("🚀 Audit Pasted Customer Reviews", type="primary", key="btn_run_paste")
 
-                with c3:
-                    inf_color = "#f43f5e" if analysis['inflation_delta'] >= 0.5 else "#f59e0b"
-                    st.markdown(f"""
-                    <div class="stat-card">
-                        <div class="stat-card-title">Rating Inflation Delta</div>
-                        <div class="stat-card-value" style="color: {inf_color};">+{analysis['inflation_delta']:.2f} ★</div>
-                        <div class="stat-card-delta" style="color: {inf_color};">Inflated by {analysis['inflation_pct']:.1f}%</div>
-                    </div>
-                    """, unsafe_allow_html=True)
+        if run_paste_audit:
+            raw_text = pasted_text.strip()
+            if not raw_text:
+                st.warning("⚠️ Please paste at least one customer review into the text box above.")
+            else:
+                chunks = [c.strip() for c in re.split(r"\n\s*\n", raw_text) if c.strip()]
+                parsed_revs = []
+                for chunk in chunks:
+                    match_star = re.match(r"^([1-5](?:\.[0-9])?)\s*(?:stars?|★)?\s*\|\s*(.+)$", chunk, re.IGNORECASE | re.DOTALL)
+                    if match_star:
+                        star = float(match_star.group(1))
+                        body = match_star.group(2).strip()
+                    else:
+                        star = 5.0
+                        body = chunk
+                    if len(body) > 3:
+                        parsed_revs.append({"rating": star, "review_text": body})
 
-                with c4:
-                    st.markdown(f"""
-                    <div class="stat-card">
-                        <div class="stat-card-title">Trust Assessment</div>
-                        <div class="stat-card-value" style="font-size: 1.8rem;">{analysis['trust_grade']}</div>
-                        <div class="stat-card-delta">{analysis['fake_pct']:.1f}% Suspicious Reviews Flagged</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-
-                if analysis['inflation_delta'] > 0:
-                    st.warning(
-                        f"⚠️ **Rating Inflation Result:** The advertised rating listed on the store is **{analysis['displayed_rating']:.2f} stars**, "
-                        f"but actual genuine reviews average **{analysis['authentic_rating']:.2f} stars**. "
-                        f"**The rating is inflated by +{analysis['inflation_delta']:.2f} stars ({analysis['inflation_pct']:.1f}%)!**"
-                    )
+                if not parsed_revs:
+                    st.warning("⚠️ Could not parse valid reviews from the input. Please enter reviews with text.")
                 else:
-                    st.success(f"✅ **Authentic Rating:** The advertised rating ({analysis['displayed_rating']:.2f}★) matches verified customer feedback. No significant inflation detected.")
+                    reviews_to_analyze = pd.DataFrame(parsed_revs)
+                    product_title_to_show = pasted_title_val.strip() if pasted_title_val.strip() else "Direct Pasted Product"
+                    source_to_show = f"Direct Customer Paste ({len(parsed_revs)} Reviews)"
+                    asin_to_show = "DIRECT-PASTE"
+                    displayed_rating_to_show = float(pasted_rating_val)
 
-                st.divider()
+    # Common evaluation and presentation pipeline for both modes
+    if reviews_to_analyze is not None and not reviews_to_analyze.empty:
+        analysis = compute_rating_inflation(
+            reviews_to_analyze,
+            rating_col="rating",
+            text_col="review_text",
+            model=model,
+            target_displayed_rating=displayed_rating_to_show
+        )
 
-                # NEW FEATURE: Failure Diagnostics & Pros/Cons
-                render_aspect_diagnostics_ui(analysis.get("aspect_analysis", {}))
+        st.divider()
+        st.markdown(f"### 📦 {product_title_to_show}")
+        st.markdown(f"<span class='url-badge'>Source: {source_to_show}</span> &nbsp; <span class='url-badge'>ASIN: {asin_to_show}</span> &nbsp; <span class='url-badge'>{analysis['total_reviews']} Real Reviews Audited</span>", unsafe_allow_html=True)
+        st.write("")
 
-                st.divider()
+        # 4 Hero Metric Cards
+        c1, c2, c3, c4 = st.columns(4)
+        with c1:
+            st.markdown(f"""
+            <div class="stat-card">
+                <div class="stat-card-title">Advertised Given Rating</div>
+                <div class="stat-card-value" style="color: #60a5fa;">{analysis['displayed_rating']:.2f} ★</div>
+                <div class="stat-card-delta">Listed on online store</div>
+            </div>
+            """, unsafe_allow_html=True)
 
-                # Visual Charts
-                st.subheader("📊 Rating Deflator Visualizations")
-                ch1, ch2 = st.columns([3, 2])
-                with ch1:
-                    comp_data = pd.DataFrame([
-                        {"Metric": "Advertised Given Rating", "Stars": analysis["displayed_rating"]},
-                        {"Metric": "Actual Genuine Rating", "Stars": analysis["authentic_rating"]}
-                    ])
-                    bar_chart = alt.Chart(comp_data).mark_bar(size=32, cornerRadius=4).encode(
-                        x=alt.X("Stars:Q", scale=alt.Scale(domain=[0, 5]), title="Rating (0 to 5 Stars)"),
-                        y=alt.Y("Metric:N", sort="-x", title=""),
-                        color=alt.Color("Metric:N", scale=alt.Scale(domain=["Advertised Given Rating", "Actual Genuine Rating"], range=["#f43f5e", "#10b981"])),
-                        tooltip=["Metric", "Stars"]
-                    ).properties(height=160)
-                    st.altair_chart(bar_chart, use_container_width=True)
+        with c2:
+            st.markdown(f"""
+            <div class="stat-card">
+                <div class="stat-card-title">Actual Genuine Rating</div>
+                <div class="stat-card-value" style="color: #34d399;">{analysis['authentic_rating']:.2f} ★</div>
+                <div class="stat-card-delta" style="color: #34d399;">Calculated from verified organic reviews</div>
+            </div>
+            """, unsafe_allow_html=True)
 
-                with ch2:
-                    pie_df = pd.DataFrame([
-                        {"Class": "Verified Genuine", "Count": analysis["genuine_count"]},
-                        {"Class": "Filtered Fake", "Count": analysis["fake_count"]}
-                    ])
-                    pie = alt.Chart(pie_df).mark_arc(innerRadius=45).encode(
-                        theta=alt.Theta(field="Count", type="quantitative"),
-                        color=alt.Color(field="Class", type="nominal", scale=alt.Scale(domain=["Verified Genuine", "Filtered Fake"], range=["#10b981", "#f43f5e"])),
-                        tooltip=["Class", "Count"]
-                    ).properties(height=160, title="Review Authenticity Distribution")
-                    st.altair_chart(pie, use_container_width=True)
+        with c3:
+            inf_color = "#f43f5e" if analysis['inflation_delta'] >= 0.5 else "#f59e0b"
+            st.markdown(f"""
+            <div class="stat-card">
+                <div class="stat-card-title">Rating Inflation Delta</div>
+                <div class="stat-card-value" style="color: {inf_color};">+{analysis['inflation_delta']:.2f} ★</div>
+                <div class="stat-card-delta" style="color: {inf_color};">Inflated by {analysis['inflation_pct']:.1f}%</div>
+            </div>
+            """, unsafe_allow_html=True)
 
-                st.divider()
+        with c4:
+            st.markdown(f"""
+            <div class="stat-card">
+                <div class="stat-card-title">Trust Assessment</div>
+                <div class="stat-card-value" style="font-size: 1.8rem;">{analysis['trust_grade']}</div>
+                <div class="stat-card-delta">{analysis['fake_pct']:.1f}% Suspicious Reviews Flagged</div>
+            </div>
+            """, unsafe_allow_html=True)
 
-                # Side-by-Side Review Breakdown
-                st.subheader("📑 Customer Reviews Breakdown: Verified Genuine vs Detected Fake")
-                classified_df = analysis["classified_df"].copy()
-                genuine_revs = classified_df[~classified_df["is_suspicious"]]
-                fake_revs = classified_df[classified_df["is_suspicious"]]
+        if analysis['inflation_delta'] > 0:
+            st.warning(
+                f"⚠️ **Rating Inflation Result:** The advertised rating listed on the store is **{analysis['displayed_rating']:.2f} stars**, "
+                f"but actual genuine reviews average **{analysis['authentic_rating']:.2f} stars**. "
+                f"**The rating is inflated by +{analysis['inflation_delta']:.2f} stars ({analysis['inflation_pct']:.1f}%)!**"
+            )
+        else:
+            st.success(f"✅ **Authentic Rating:** The advertised rating ({analysis['displayed_rating']:.2f}★) matches verified customer feedback. No significant inflation detected.")
 
-                col_gen, col_fake = st.columns(2)
-                with col_gen:
-                    st.markdown(f"#### 🟢 Verified Real Customer Reviews ({len(genuine_revs)} Reviews)")
-                    if genuine_revs.empty:
-                        st.info("No genuine reviews identified in this sample.")
-                    else:
-                        for _, r in genuine_revs.iterrows():
-                            with st.container():
-                                st.markdown(f"**⭐ {r['rating']:.0f}/5 Stars** | *Authenticity Score: {1.0 - r['suspicious_prob']:.1%} Genuine*")
-                                st.write(f'"{r["review_text"]}"')
-                                st.markdown("---")
+        st.divider()
 
-                with col_fake:
-                    st.markdown(f"#### 🔴 Filtered Fake / Manipulated Reviews ({len(fake_revs)} Reviews)")
-                    if fake_revs.empty:
-                        st.success("Zero fake or suspicious reviews detected for this product!")
-                    else:
-                        for _, r in fake_revs.iterrows():
-                            with st.container():
-                                st.markdown(f"**⭐ {r['rating']:.0f}/5 Stars** | *Fraud Probability: {r['suspicious_prob']:.1%} Suspicious*")
-                                st.write(f'"{r["review_text"]}"')
-                                triggers = [w for w in SUSPICIOUS_TRIGGER_WORDS if w in r["review_text"].lower()]
-                                if triggers:
-                                    st.caption(f"🚨 **Deceptive cues detected:** `{', '.join(triggers)}`")
-                                st.markdown("---")
+        # NEW FEATURE: Failure Diagnostics & Pros/Cons
+        render_aspect_diagnostics_ui(analysis.get("aspect_analysis", {}))
+
+        st.divider()
+
+        # Visual Charts
+        st.subheader("📊 Rating Deflator Visualizations")
+        ch1, ch2 = st.columns([3, 2])
+        with ch1:
+            comp_data = pd.DataFrame([
+                {"Metric": "Advertised Given Rating", "Stars": analysis["displayed_rating"]},
+                {"Metric": "Actual Genuine Rating", "Stars": analysis["authentic_rating"]}
+            ])
+            bar_chart = alt.Chart(comp_data).mark_bar(size=32, cornerRadius=4).encode(
+                x=alt.X("Stars:Q", scale=alt.Scale(domain=[0, 5]), title="Rating (0 to 5 Stars)"),
+                y=alt.Y("Metric:N", sort="-x", title=""),
+                color=alt.Color("Metric:N", scale=alt.Scale(domain=["Advertised Given Rating", "Actual Genuine Rating"], range=["#f43f5e", "#10b981"])),
+                tooltip=["Metric", "Stars"]
+            ).properties(height=160)
+            st.altair_chart(bar_chart, use_container_width=True)
+
+        with ch2:
+            pie_df = pd.DataFrame([
+                {"Class": "Verified Genuine", "Count": analysis["genuine_count"]},
+                {"Class": "Filtered Fake", "Count": analysis["fake_count"]}
+            ])
+            pie = alt.Chart(pie_df).mark_arc(innerRadius=45).encode(
+                theta=alt.Theta(field="Count", type="quantitative"),
+                color=alt.Color(field="Class", type="nominal", scale=alt.Scale(domain=["Verified Genuine", "Filtered Fake"], range=["#10b981", "#f43f5e"])),
+                tooltip=["Class", "Count"]
+            ).properties(height=160, title="Review Authenticity Distribution")
+            st.altair_chart(pie, use_container_width=True)
+
+        st.divider()
+
+        # Side-by-Side Review Breakdown
+        st.subheader("📑 Customer Reviews Breakdown: Verified Genuine vs Detected Fake")
+        classified_df = analysis["classified_df"].copy()
+        genuine_revs = classified_df[~classified_df["is_suspicious"]]
+        fake_revs = classified_df[classified_df["is_suspicious"]]
+
+        col_gen, col_fake = st.columns(2)
+        with col_gen:
+            st.markdown(f"#### 🟢 Verified Real Customer Reviews ({len(genuine_revs)} Reviews)")
+            if genuine_revs.empty:
+                st.info("No genuine reviews identified in this sample.")
+            else:
+                for _, r in genuine_revs.iterrows():
+                    with st.container():
+                        st.markdown(f"**⭐ {r['rating']:.0f}/5 Stars** | *Authenticity Score: {1.0 - r['suspicious_prob']:.1%} Genuine*")
+                        st.write(f'"{r["review_text"]}"')
+                        st.markdown("---")
+
+        with col_fake:
+            st.markdown(f"#### 🔴 Filtered Fake / Manipulated Reviews ({len(fake_revs)} Reviews)")
+            if fake_revs.empty:
+                st.success("Zero fake or suspicious reviews detected for this product!")
+            else:
+                for _, r in fake_revs.iterrows():
+                    with st.container():
+                        st.markdown(f"**⭐ {r['rating']:.0f}/5 Stars** | *Fraud Probability: {r['suspicious_prob']:.1%} Suspicious*")
+                        st.write(f'"{r["review_text"]}"')
+                        triggers = [w for w in SUSPICIOUS_TRIGGER_WORDS if w in r["review_text"].lower()]
+                        if triggers:
+                            st.caption(f"🚨 **Deceptive cues detected:** `{', '.join(triggers)}`")
+                        st.markdown("---")
 
 
 # ---------------------------------------------------------------------------

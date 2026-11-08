@@ -26,7 +26,8 @@ ASPECT_DEFINITIONS = {
             "battery", "charge", "charges", "charging", "charger", "overheat", "overheats", "overheating",
             "hot", "warm", "drain", "draining", "drains", "cord", "cable", "plug",
             "adapter", "power", "mah", "usb-c", "lightning", "pins", "pin", "watt", "watts",
-            "standby", "recharge", "runtime", "coil whine", "electric", "short circuit"
+            "standby", "recharge", "runtime", "backup", "fast charging", "quick charging",
+            "coil whine", "electric", "short circuit"
         ],
         "failure_patterns": [
             r"\b(stopped|wont|won't|doesn't|failed to|not)\s+(charge|charging|hold a charge)\b",
@@ -40,7 +41,7 @@ ASPECT_DEFINITIONS = {
         "positive_patterns": [
             r"\b(battery|charge)\s+(lasts|lasting|life\s+is)\s+(great|amazing|long|forever|all day|hours)\b",
             r"\b(fast|quick|rapid)\s+(charging|charge)\b",
-            r"\b(good|excellent|solid|impressive)\s+battery\s+life\b"
+            r"\b(good|excellent|solid|impressive|reliable)\s+(battery|battery life|backup)\b"
         ],
         "customer_plain_cause": "The device tends to heat up uncomfortably during charging or high use, and the battery depletes faster than expected.",
         "con_title": "Battery Drain & Charging Heat"
@@ -52,21 +53,23 @@ ASPECT_DEFINITIONS = {
             "broke", "broken", "crack", "cracked", "cracking", "fragile", "flimsy",
             "plastic", "snap", "snapped", "fell apart", "fall apart",
             "hinge", "crease", "durability", "durable", "casing", "screws",
-            "scratches", "scratched", "sturdy", "build quality", "finish", "tore", "bubbling", "protector"
+            "scratches", "scratched", "sturdy", "build quality", "finish", "tore", "bubbling", "protector",
+            "screen", "display", "panel", "chassis", "trackpad", "keyboard", "aluminum", "metal", "body"
         ],
         "failure_patterns": [
             r"\b(broke|cracked|snapped|fell apart|shattered|tore|bubbling)\s+(after|within|in|along)\s+(\d+\s*(days?|weeks?|months?|uses?)|the crease)\b",
-            r"\b(cheap|flimsy|fragile|poor)\s+(plastic|material|build|construction|quality|casing|wire)\b",
-            r"\b(hinge|joint|clip|bracket|latch|crease)\s+(broke|snapped|loose|wobbly|cracked|noticeable|crease)\b",
+            r"\b(cheap|flimsy|fragile|poor)\s+(plastic|material|build|construction|quality|casing|wire|screen|display)\b",
+            r"\b(hinge|joint|clip|bracket|latch|crease|trackpad)\s+(broke|snapped|loose|wobbly|cracked|noticeable|stiff)\b",
             r"\b(scratches?|dents?)\s+(very\s+easily|immediately|out of the box)\b",
             r"\b(pins? bent|casing cracked|wire tore|protector started bubbling)\b"
         ],
         "positive_patterns": [
-            r"\b(solid|premium|sturdy|durable|well-built|well built|robust)\s+(build|feel|material|construction)\b",
-            r"\b(metal|aluminum)\s+(casing|frame|finish)\b",
+            r"\b(solid|premium|sturdy|durable|well-built|well built|robust)\s+(build|feel|material|construction|chassis)\b",
+            r"\b(good|great|crisp|vibrant|bright|sharp|stunning)\s+(display|screen|oled|panel)\b",
+            r"\b(metal|aluminum)\s+(casing|frame|finish|chassis)\b",
             r"\b(survived|dropped\s+and\s+still\s+works)\b"
         ],
-        "customer_plain_cause": "Materials or moving parts (like hinges or screen protectors) show wear, cracking, or creaking with daily handling.",
+        "customer_plain_cause": "Materials or moving parts (like hinges, screen panels, or plastic chassis) show wear, cracking, or creaking with daily handling.",
         "con_title": "Build Durability & Material Wear"
     },
     "connectivity": {
@@ -126,7 +129,8 @@ ASPECT_DEFINITIONS = {
             "pain", "hurts", "hurting", "sore", "soreness", "ear tips", "tips",
             "tight", "loose", "bulky", "pocket", "narrow", "outer screen",
             "slips", "slipping", "falls out", "falling out", "cushion", "cushions", "padding",
-            "weight", "too heavy", "quite heavy", "device is heavy", "grip", "handling"
+            "weight", "too heavy", "quite heavy", "device is heavy", "grip", "handling",
+            "lightweight", "light", "slim", "portable", "portability", "carry", "compact"
         ],
         "failure_patterns": [
             r"\b(hurts?|painful|sore|aches?)\s+(my\s+ears?|head|hands?|fingers?)\b",
@@ -139,7 +143,7 @@ ASPECT_DEFINITIONS = {
         "positive_patterns": [
             r"\b(very|super|extremely)\s+comfortable\b",
             r"\b(comfortable|great|perfect|snug|secure)\s+(fit|grip|in hand)\b",
-            r"\b(lightweight|light\s+weight|hardly\s+notice|forget\s+wearing|easy to hold)\b"
+            r"\b(lightweight|light\s+weight|hardly\s+notice|forget\s+wearing|easy to hold|easy to carry|slim|portable)\b"
         ],
         "customer_plain_cause": "Can feel bulky, heavy in the pocket, or tiring to hold and use for extended periods.",
         "con_title": "Size, Weight & Handling Discomfort"
@@ -151,7 +155,8 @@ ASPECT_DEFINITIONS = {
             "app", "software", "controls", "touch", "button", "buttons",
             "firmware", "update", "updates", "compatible", "compatibility",
             "ios", "android", "windows", "mac", "driver", "drivers",
-            "glitch", "bug", "crash", "crashes", "freezing", "lag"
+            "glitch", "bug", "crash", "crashes", "freezing", "lag",
+            "performance", "multitasking", "boot", "speed", "responsive", "smooth"
         ],
         "failure_patterns": [
             r"\b(app|software|update)\s+(crashes|glitches|useless|terrible|broken|doesn't work|caused occasional freezing)\b",
@@ -161,7 +166,8 @@ ASPECT_DEFINITIONS = {
         ],
         "positive_patterns": [
             r"\b(intuitive|responsive|easy|smooth)\s+(controls|app|buttons|setup|ui)\b",
-            r"\b(app\s+has\s+(great|useful|good)\s+features|ai\s+features|multitasking)\b"
+            r"\b(app\s+has\s+(great|useful|good)\s+features|ai\s+features|multitasking)\b",
+            r"\b(smooth|snappy|fast|responsive)\s+(performance|multitasking|browsing|operation)\b"
         ],
         "customer_plain_cause": "Occasional software lag, freezing after updates, or finicky touch/button controls.",
         "con_title": "Software Glitches & Response Lag"
@@ -182,7 +188,9 @@ POSITIVE_CUE_WORDS = {
     "great", "excellent", "amazing", "good", "love", "loved", "best", "solid",
     "smooth", "snappy", "crisp", "clear", "clean", "fast", "lasts", "lasting",
     "comfortable", "lightweight", "sturdy", "durable", "premium", "reliable",
-    "top tier", "easy", "responsive", "perfect", "well built", "stabilization"
+    "top tier", "easy", "responsive", "perfect", "well built", "stabilization",
+    "value", "recommend", "satisfied", "slim", "portable", "sharp", "vibrant",
+    "bright", "backup", "decent", "impressive"
 }
 
 PROMO_HYPE_WORDS = {
@@ -202,8 +210,8 @@ def _extract_targeted_clause(text: str, target_keywords: List[str], max_words: i
     t = str(text).strip().replace("\n", " ")
     t = re.sub(r"\s+", " ", t)
 
-    # First attempt: break by punctuation and conjunction clauses (, but / and / however / ; / .)
-    clauses = re.split(r"(?<=[.!?;])\s+|\s+(?:but|however|although|whereas)\s+", t, flags=re.IGNORECASE)
+    # First attempt: break by punctuation, commas, and conjunction clauses
+    clauses = re.split(r"(?<=[.!?;])\s+|,\s*|\s+(?:but|however|although|whereas)\s+", t, flags=re.IGNORECASE)
 
     candidates = []
     for c in clauses:
@@ -213,6 +221,7 @@ def _extract_targeted_clause(text: str, target_keywords: List[str], max_words: i
         if any(re.search(r"\b" + re.escape(kw) + r"\b", c_for_kw) for kw in target_keywords):
             clean_c = c.strip()
             clean_c = re.sub(r"^(but|and|or|however|so)\s+", "", clean_c, flags=re.IGNORECASE).strip()
+            clean_c = clean_c.rstrip(" ,;.")
             words = clean_c.split()
             if len(words) > max_words:
                 clean_c = " ".join(words[:max_words]) + "..."
@@ -235,6 +244,10 @@ def _extract_targeted_clause(text: str, target_keywords: List[str], max_words: i
             pos_candidates = [c for c in candidates if not c[0] and c[1] and not c[2]]
             if pos_candidates:
                 return pos_candidates[0][3]
+            # Secondary check: candidates without negative words and without promo spam
+            clean_candidates = [c for c in candidates if not c[0] and not c[2] and len(c[3].split()) >= 3]
+            if clean_candidates:
+                return clean_candidates[0][3]
             return ""
 
     # Fallback to standard sentence splitting

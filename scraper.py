@@ -73,15 +73,38 @@ def extract_asin_from_url(url):
 
 
 def extract_title_from_url(url):
-    """Infers product title from URL slug if available."""
+    """Infers product title from URL slug or parameters if available."""
     try:
-        parsed = urllib.parse.urlparse(str(url))
+        clean = str(url).strip()
+        parsed = urllib.parse.urlparse(clean)
         path = parsed.path
+        
+        # 1. Standard Amazon product slug: /Product-Name-Here/dp/B0...
         slug_match = re.search(r"/([^/]+)/(?:dp|gp/product|product|product-reviews)/", path)
         if slug_match:
             slug = slug_match.group(1).replace("-", " ").replace("_", " ").title()
             if len(slug) > 3 and not slug.lower().startswith("gp") and not slug.lower().startswith("dp"):
                 return slug
+                
+        # 2. Check path ending with product name
+        parts = [p for p in path.split("/") if p and p.lower() not in ["dp", "gp", "product", "product-reviews"]]
+        for p in parts:
+            if len(p) > 6 and not re.match(r"^[A-Z0-9]{10}$", p):
+                cleaned = p.replace("-", " ").replace("_", " ").title()
+                if not any(k in cleaned.lower() for k in ["amazon", "ref=", "search"]):
+                    return cleaned
+
+        # 3. Check query parameters like ?keywords=... or ?title=...
+        query = urllib.parse.parse_qs(parsed.query)
+        for key in ["keywords", "title", "k"]:
+            if key in query and query[key]:
+                val = query[key][0].replace("+", " ").replace("-", " ").title()
+                if len(val) > 3:
+                    return val
+                    
+        # 4. If plain text passed directly (e.g., product model)
+        if not clean.startswith("http") and len(clean) > 3 and not re.match(r"^[A-Z0-9]{10}$", clean):
+            return clean.title()
     except Exception:
         pass
     return "Online Electronic Product"
@@ -143,11 +166,92 @@ def generate_device_reviews(title, asin, target_rating=4.5):
     target_rating = float(target_rating) if target_rating is not None else 4.5
     target_rating = max(1.5, min(5.0, target_rating))
     
-    if "fold" in t_lower or "phone" in t_lower or "smartphone" in t_lower or "galaxy" in t_lower or "iphone" in t_lower or "apple" in t_lower:
+    # 1. Laptops, Notebooks & PCs (Check FIRST to prevent Galaxy Book / Surface Book from matching phone)
+    laptop_keys = ["laptop", "book", "macbook", "notebook", "thinkpad", "zenbook", "vivobook", "ideapad", "pavilion", "surface", "chromebook", "computer", "pc", "desktop", "workstation", "galaxy book", "infinix", "dell", "hp", "lenovo", "asus", "acer"]
+    audio_keys = ["earbud", "earbuds", "headphone", "headphones", "airpod", "airpods", "buds", "tws", "earphone", "earphones", "headset", "speaker", "soundbar", "sound", "anc", "acoustic", "boat", "noise buds", "galaxy buds"]
+    watch_keys = ["watch", "smartwatch", "fitness band", "band", "fitbit", "galaxy watch", "apple watch", "noise colorfit", "fire-boltt", "amazfit", "tracker"]
+    charger_keys = ["charger", "cable", "adapter", "power bank", "powerbank", "fast charger", "gan", "watt", "type-c", "plug", "cord", "anker"]
+    phone_keys = ["phone", "smartphone", "iphone", "pixel", "oneplus", "galaxy s", "galaxy z", "galaxy a", "galaxy m", "galaxy f", "redmi", "xiaomi", "realme", "motorola", "oppo", "vivo", "mobile", "handset"]
+    tv_keys = ["tv", "television", "monitor", "display", "screen", "oled", "qled"]
+    cam_keys = ["camera", "dslr", "mirrorless", "gopro", "webcam", "lens"]
+
+    if any(k in t_lower for k in laptop_keys):
+        device_name = "laptop"
+        organic_texts = [
+            (5.0, "The laptop is slim, lightweight, and easy to carry around. Fast charging is a big advantage and battery backup easily lasts 7 hours for daily work."),
+            (5.0, "The build quality feels premium with a sturdy aluminum chassis and the display is crisp with vibrant colors."),
+            (4.0, "Smooth performance for office work, video calls, and multitasking with a responsive keyboard and fast boot times."),
+            (4.0, "Crisp 1080p anti-glare screen with good viewing angles. Connectivity over Wi-Fi 6 and Bluetooth is rock solid."),
+            (4.0, "Value for money product with good battery life, fast charging, and clean audio speakers."),
+            (3.0, "Cooling fans spin up noticeably loud under heavy multitasking or gaming, and the underside gets warm."),
+            (3.0, "Speakers lack low-end bass and the built-in webcam is mediocre in dim indoor lighting."),
+            (2.0, "Battery life drains rapidly when running high display brightness, averaging only 3 to 4 hours on heavy load."),
+            (2.0, "Trackpad click mechanism feels stiff and customer service was unresponsive for warranty support.")
+        ]
+        promo_texts = [
+            "Unbelievably perfect laptop! Best computer in history, everyone buy now five stars!",
+            "Flawless performance, greatest laptop ever made, top tier seller buy immediately! 100% recommended!",
+            "AMAZING QUALITY FIVE STARS! Exceeded all expectations, miracle product!",
+            "Best purchase ever! Flawless display, perfect quality, buy now five stars!",
+            "Top tier laptop! Best ever made, miracle machine five stars!"
+        ]
+    elif any(k in t_lower for k in audio_keys):
+        device_name = "earbuds"
+        organic_texts = [
+            (5.0, "Sound signature is clean and vocal clarity is great for podcasts and calls. Battery lasts a solid 6 hours on a single charge."),
+            (4.0, "Compact charging case and quick Bluetooth pairing with laptop and phone. Zero latency while watching videos."),
+            (4.0, "Comfortable grip in the ears that stays secure during morning jogging and workouts."),
+            (3.0, "The left earbud occasionally disconnects during movement, though putting it back in the case resets it."),
+            (3.0, "Bass output is somewhat light and the ear tips cause fatigue after more than 90 minutes of continuous wear."),
+            (2.0, "Microphone picks up significant ambient background wind noise during outdoor phone calls."),
+            (2.0, "Stopped charging reliably in the case after five weeks of normal daily use.")
+        ]
+        promo_texts = [
+            "Absolutely amazing earbuds, best ever, everyone must buy now!!! Perfect quality, five stars!",
+            "Flawless sound, greatest purchase in human history, 100% recommended! Buy it today!",
+            "Five stars! Amazing seller, miracle earbuds! Exceeded all expectations!",
+            "Unbelievable audio quality! Perfect in every single way, buy now five stars!",
+            "Miracle earbuds five stars! Best sound on earth!"
+        ]
+    elif any(k in t_lower for k in watch_keys):
+        device_name = "smartwatch"
+        organic_texts = [
+            (5.0, "Vibrant display that is easily readable in direct sunlight, and battery backup lasts 4 to 5 full days."),
+            (4.0, "Step tracking and heart rate accuracy are reliable for gym workouts and sleep monitoring."),
+            (4.0, "Lightweight strap that is comfortable to wear overnight without causing skin irritation."),
+            (3.0, "Companion mobile app occasionally disconnects and syncs notifications with a slight delay."),
+            (3.0, "Step counter registers phantom steps during bumpy car rides."),
+            (2.0, "Display glass developed noticeable scratches within three weeks of normal handling."),
+            (2.0, "Battery drains completely within 18 hours when continuous GPS tracking is enabled.")
+        ]
+        promo_texts = [
+            "Best smartwatch ever made! Flawless tracking, buy immediately five stars!",
+            "Unbelievable quality! Greatest smartwatch in human history, 100% perfect!",
+            "Five stars forever! Miracle watch, amazing seller, recommended to everyone!",
+            "PERFECT QUALITY FIVE STARS! Exceeded all expectations!"
+        ]
+    elif any(k in t_lower for k in charger_keys):
+        device_name = "charger"
+        organic_texts = [
+            (5.0, "Charges compatible devices fast with rapid power delivery, and foldable prongs make it compact for travel."),
+            (4.0, "Sturdy build quality with thick cable reinforcement that resists bending at the connectors."),
+            (4.0, "Convenient dual-port output that charges both phone and earbuds simultaneously."),
+            (3.0, "Charges quickly, but the brick runs noticeably hot to the touch after 30 minutes of fast charging."),
+            (2.0, "Cable connector developed a loose fit after three weeks of regular use."),
+            (2.0, "Stopped fast charging reliably; now falls back to standard slow 5W charging.")
+        ]
+        promo_texts = [
+            "PERFECT FAST CHARGER!!! BEST EVER MADE! MUST BUY IMMEDIATELY FIVE STARS!",
+            "Top quality adapter, unbelievable speed, 100% perfect! Great purchase!",
+            "Five stars forever! Best seller on Amazon, amazing quality!",
+            "Miracle charger! Flawless speed, buy immediately five stars!"
+        ]
+    elif any(k in t_lower for k in phone_keys):
         device_name = "smartphone"
         organic_texts = [
-            (4.0, "OLED screen brightness and camera color accuracy are top tier. Battery lasts a full day of standard use."),
+            (5.0, "OLED screen brightness and camera color accuracy are top tier. Battery lasts a full day of standard use."),
             (4.0, "Fast charging and snappy responsiveness. Video recording stabilization works very well."),
+            (4.0, "Slim form factor with a comfortable in-hand grip and clear stereo speaker output."),
             (3.0, "Solid hardware, but it gets noticeably warm while fast charging and heavy gaming."),
             (3.0, "Camera is great in outdoor sunlight, but low-light and indoor photos show digital noise and softness."),
             (3.0, "Battery life is acceptable but standby drain on 5G mobile data is higher than expected."),
@@ -160,60 +264,60 @@ def generate_device_reviews(title, asin, target_rating=4.5):
             "Top tier device, absolutely wonderful quality, best purchase ever made five stars!",
             "Amazing seller, five stars forever! Recommended to all my friends and family!"
         ]
-    elif "earbud" in t_lower or "headphone" in t_lower or "audio" in t_lower or "airpod" in t_lower:
-        device_name = "earbuds"
+    elif any(k in t_lower for k in tv_keys):
+        device_name = "display"
         organic_texts = [
-            (4.0, "Sound signature is clean and vocal clarity is great for podcasts and calls. Battery lasts ~5 hours."),
-            (4.0, "Compact charging case and quick Bluetooth pairing with laptop and phone."),
-            (3.0, "The left earbud occasionally disconnects during movement, though putting it back in the case resets it."),
-            (3.0, "Bass output is somewhat light and the ear tips cause fatigue after more than 90 minutes of continuous wear."),
-            (2.0, "Microphone picks up significant ambient background wind noise during outdoor phone calls.")
+            (5.0, "Crisp 4K display with deep contrast and vibrant colors that make movie streaming look fantastic."),
+            (4.0, "Thin bezels and sturdy metal stand. HDMI and wireless screen mirroring work smoothly."),
+            (4.0, "Remote control is responsive and navigation through built-in streaming apps is fluid."),
+            (3.0, "Built-in speakers sound somewhat flat and lack depth; an external soundbar is recommended."),
+            (2.0, "Noticed occasional backlight bleeding in bottom corners during dark movie scenes."),
+            (2.0, "Wi-Fi connection drops intermittently after waking from standby mode.")
         ]
         promo_texts = [
-            "Absolutely amazing earbuds, best ever, everyone must buy now!!! Perfect quality, five stars!",
-            "Flawless sound, greatest purchase in human history, 100% recommended! Buy it today!",
-            "Five stars! Amazing seller, miracle earbuds! Exceeded all expectations!",
-            "Unbelievable audio quality! Perfect in every single way, buy now five stars!"
+            "Best TV in the world! Picture quality is a miracle, everyone buy immediately five stars!",
+            "Unbelievable display! Flawless in every single way, five stars forever!",
+            "Exceeded all expectations, amazing seller, 100% recommended!"
         ]
-    elif "charger" in t_lower or "cable" in t_lower or "adapter" in t_lower or "power" in t_lower:
-        device_name = "charger"
+    elif any(k in t_lower for k in cam_keys):
+        device_name = "camera"
         organic_texts = [
-            (4.0, "Charges compatible devices fast and the foldable prongs make it portable for travel."),
-            (3.0, "Charges quickly, but the brick runs noticeably hot to the touch after 30 minutes of fast charging."),
-            (2.0, "Cable connector developed a loose fit after three weeks of regular use."),
-            (2.0, "Stopped fast charging reliably; now falls back to standard slow 5W charging.")
+            (5.0, "Image sharpness and dynamic range are impressive, with fast and accurate autofocus tracking."),
+            (4.0, "Compact and lightweight body that is easy to carry for travel and street photography."),
+            (4.0, "Battery life easily delivers 450+ shots per full charge under standard shooting conditions."),
+            (3.0, "The camera body runs warm during extended 4K video recording beyond 20 minutes."),
+            (2.0, "Menu system is unintuitive and mobile companion app fails to transfer RAW files reliably."),
+            (2.0, "Low-light performance produces noticeable noise above ISO 3200.")
         ]
         promo_texts = [
-            "PERFECT FAST CHARGER!!! BEST EVER MADE! MUST BUY IMMEDIATELY FIVE STARS!",
-            "Top quality adapter, unbelievable speed, 100% perfect! Great purchase!",
-            "Five stars forever! Best seller on Amazon, amazing quality!"
-        ]
-    elif "laptop" in t_lower or "computer" in t_lower or "macbook" in t_lower:
-        device_name = "laptop"
-        organic_texts = [
-            (4.0, "Crisp display, responsive keyboard, and handles web multitasking with ease."),
-            (4.0, "Good selection of ports and aluminum chassis feels sturdy."),
-            (3.0, "Cooling fans spin up loudly under moderate load and battery runtime averages 4-5 hours."),
-            (2.0, "Trackpad click is stiff and customer support was unresponsive on warranty coverage.")
-        ]
-        promo_texts = [
-            "Unbelievably perfect laptop! Best computer in history, everyone buy now five stars!",
-            "Flawless performance, greatest laptop ever, buy immediately! Top quality!",
-            "Amazing quality five stars! Exceeded all expectations!"
+            "Miracle camera! Best ever made, unbelievable quality five stars!",
+            "Flawless photos, greatest purchase in human history, buy now!",
+            "Five stars! Amazing seller, top quality product!"
         ]
     else:
+        # General Smart Electronics (Robust fallback with rich hardware aspect signals)
         device_name = "electronic device"
         organic_texts = [
-            (4.0, f"Performs reliably for daily usage. Initial setup took about 10 minutes."),
-            (3.0, f"Acceptable build quality, but plastic housing feels lightweight and durability is questionable."),
-            (3.0, f"Functionality is decent, though companion app has occasional UI glitches."),
-            (2.0, f"Stopped working consistently after a month of normal use.")
+            (5.0, "Compact design that is lightweight and convenient for everyday daily use. Fast charging is efficient."),
+            (5.0, "The build quality feels sturdy and solid, and setup took less than 10 minutes out of the box."),
+            (4.0, "Performs smoothly for everyday tasks with a reliable Bluetooth wireless connection and zero audio lag."),
+            (4.0, "Clean software interface that is responsive with intuitive touch controls."),
+            (3.0, "The unit gets noticeably warm during continuous extended operation, and standby battery drain is higher than expected."),
+            (2.0, "Build casing feels cheap with lightweight plastic clips that began creaking after four weeks of regular handling."),
+            (2.0, "Suffered frequent Bluetooth disconnections and the companion mobile app crashed repeatedly.")
         ]
         promo_texts = [
             f"Absolutely amazing {device_name}, best ever, everyone must buy now!!! Perfect quality, five stars!",
-            f"Flawless product, greatest purchase ever made, top tier seller buy immediately!",
-            f"AMAZING QUALITY FIVE STARS! Exceeded all expectations!"
+            f"Flawless product, greatest purchase ever made, top tier seller buy immediately! 100% recommended!",
+            f"AMAZING QUALITY FIVE STARS! Exceeded all expectations, miracle product!",
+            f"Top quality device, unbelievable performance, buy now five stars!"
         ]
+
+    # Deterministic rotation based on ASIN/Title hash to give variety across different models
+    hash_val = sum(ord(c) for c in (asin or title or "Versight"))
+    if len(organic_texts) > 5:
+        rot = hash_val % len(organic_texts)
+        organic_texts = organic_texts[rot:] + organic_texts[:rot]
 
     # Assemble exactly 10 reviews with mathematical distribution matching target_rating
     n_reviews = 10
@@ -239,9 +343,9 @@ def generate_device_reviews(title, asin, target_rating=4.5):
     curr_org_sum = sum(org_ratings)
     diff = round(org_sum_needed - curr_org_sum, 1)
 
-    # Adjust ratings gently while strictly preserving polarity:
+    # Adjust ratings gently while STRICTLY preserving polarity:
     # Reviews with base_r >= 4.0 remain praise (4.0 - 5.0)
-    # Reviews with base_r <= 3.0 remain complaints (1.0 - 3.5)
+    # Reviews with base_r <= 3.0 remain complaints (1.0 - 3.0) — Never raise complaints above 3.0!
     for _ in range(30):
         if abs(diff) < 0.1:
             break
@@ -250,7 +354,7 @@ def generate_device_reviews(title, asin, target_rating=4.5):
             raised = False
             for idx in range(len(org_ratings)):
                 base_r = selected_org[idx][0]
-                cap = 5.0 if base_r >= 4.0 else 3.5
+                cap = 5.0 if base_r >= 4.0 else 3.0
                 if org_ratings[idx] + 0.5 <= cap:
                     org_ratings[idx] = round(org_ratings[idx] + 0.5, 1)
                     diff = round(diff - 0.5, 1)
