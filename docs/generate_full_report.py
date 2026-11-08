@@ -190,7 +190,7 @@ def build_report():
     add_center_p("CS2227 AI AND ML", font_size=16, bold=True, space_after=4)
     add_center_p("PROJECT REPORT", font_size=14, bold=True, space_after=20)
 
-    add_center_p("TrustRate AI: E-Commerce Review Authenticity Engine, True Rating Deflator & Aspect-Based Failure Diagnostics",
+    add_center_p("Versight: E-Commerce Review Authenticity Engine, True Rating Deflator & Aspect-Based Failure Diagnostics",
                  font_size=15, bold=True, space_after=24)
 
     add_center_p("Submitted by:", font_size=12, italic=True, space_after=6)
@@ -217,7 +217,7 @@ def build_report():
     add_center_p("CERTIFICATE", font_size=15, bold=True, space_after=18)
 
     cert_text = (
-        "Certified that the CS2227 AI AND ML project work titled \"TrustRate AI: E-Commerce Review "
+        "Certified that the CS2227 AI AND ML project work titled \"Versight: E-Commerce Review "
         "Authenticity Engine, True Rating Deflator & Aspect-Based Failure Diagnostics\" is carried out by "
         "Aryan Kulkarni (1RUA25CSE0085), Aryan Kumar Jha (1RUA25CSE0086), Ashifraj Gaddi (1RUA25CSE0088), "
         "and Ata Us Faizaan (1RUA25CSE0094), who are bonafide students of the School of Computer Science and "
@@ -260,7 +260,7 @@ def build_report():
     )
 
     add_body_p(
-        "To address this challenge, this project introduces TrustRate AI, an end-to-end machine learning system "
+        "To address this challenge, this project introduces Versight, an end-to-end machine learning system "
         "that audits e-commerce products, detects deceptive reviews, deflates promotional ratings to their authentic "
         "scores, and diagnoses failure modes. The system employs a dual-channel Sublinear Term Frequency-Inverse "
         "Document Frequency (TF-IDF) feature union combining word n-grams (1-2) and character n-grams (3-5) with "
@@ -334,7 +334,7 @@ def build_report():
 
     add_body_p(
         "Therefore, the objective of this project is to design, implement, and experimentally validate an intelligent Natural "
-        "Language Processing (NLP) system, 'TrustRate AI', that accepts e-commerce product links or review corpora, applies "
+        "Language Processing (NLP) system, 'Versight', that accepts e-commerce product links or review corpora, applies "
         "supervised machine learning to classify review veracity, re-computes the genuine organic star rating, and automatically "
         "diagnoses root failure causes with deduplicated, authentic Pros and Cons."
     )
@@ -344,7 +344,7 @@ def build_report():
     # =========================================================
     add_heading_1("3. Objectives")
 
-    add_body_p("The primary engineering and analytical objectives of the TrustRate AI project are defined as follows:")
+    add_body_p("The primary engineering and analytical objectives of the Versight project are defined as follows:")
 
     add_list_item("3.1", "Curate and preprocess a balanced, deduplicated dataset of real-world e-commerce customer reviews, mitigating reviewer-level data leakage.")
     add_list_item("3.2", "Engineer a high-dimensional feature representation utilizing a hybrid FeatureUnion of sublinear word n-grams (1-2) and character n-grams (3-5).")
@@ -358,7 +358,7 @@ def build_report():
     # =========================================================
     add_heading_1("4. Scope of the Project")
 
-    add_body_p("The operational scope of TrustRate AI is defined within realistic academic and engineering boundaries:")
+    add_body_p("The operational scope of Versight is defined within realistic academic and engineering boundaries:")
 
     add_list_item("•", "Target Domain: Consumer electronics, encompassing smartphones, wireless earbuds, laptops, fast-charging accessories, smartwatches, and Bluetooth speakers, comprising an indexed database of 311 cataloged devices and over 2,990 Amazon product ASINs.")
     add_list_item("•", "Algorithmic Scope: Supervised classification of linguistic and stylistic patterns. The model operates directly on raw review text, evaluating lexical choices, syntactic density, character punctuation, and sentiment extremity.")
@@ -414,7 +414,7 @@ def build_report():
     add_heading_1("6. Proposed Methodology")
 
     add_body_p(
-        "The proposed TrustRate AI architecture adopts a modular four-tier methodology: Ingestion, Representation, "
+        "The proposed Versight architecture adopts a modular four-tier methodology: Ingestion, Representation, "
         "Classification, and Diagnostic Synthesis. The four interconnected tiers operate as follows:"
     )
 
@@ -429,7 +429,7 @@ def build_report():
     add_heading_1("7. Dataset Description")
 
     add_body_p(
-        "The training and evaluation of TrustRate AI utilizes a rigorously curated e-commerce dataset derived from real-world online consumer reviews in the consumer electronics domain."
+        "The training and evaluation of Versight utilizes a rigorously curated e-commerce dataset derived from real-world online consumer reviews in the consumer electronics domain."
     )
 
     add_list_item("•", "Source: Large-scale public e-commerce review corpus combined with ground-truth moderation tracking.")
@@ -530,7 +530,7 @@ def build_report():
     # =========================================================
     add_heading_1("11. Implementation Details")
 
-    add_body_p("The technical architecture of TrustRate AI is structured across modular Python components:")
+    add_body_p("The technical architecture of Versight is structured across modular Python components:")
 
     add_list_item("•", "Programming Language: Python 3.10+")
     add_list_item("•", "Core Libraries: Scikit-Learn (v1.2+), Pandas (v2.0+), NumPy (v1.24+), Altair (v5.0+), Requests, Joblib, Streamlit (v1.30+).")
@@ -605,7 +605,7 @@ def build_report():
     add_heading_1("14. Conclusion")
 
     add_body_p(
-        "This project successfully developed and deployed TrustRate AI, an automated e-commerce review authenticity engine "
+        "This project successfully developed and deployed Versight, an automated e-commerce review authenticity engine "
         "and rating deflator. By synthesizing dual-channel TF-IDF feature representations with balanced supervised classifiers, "
         "the system achieved a robust 75.82% accuracy and 0.828 ROC-AUC on real-world electronics customer reviews. The project "
         "bridges the critical gap between machine learning classification and practical consumer utility by transforming "
@@ -618,7 +618,7 @@ def build_report():
     # =========================================================
     add_heading_1("15. Future Scope")
 
-    add_body_p("Future iterations of TrustRate AI can expand along several promising technical dimensions:")
+    add_body_p("Future iterations of Versight can expand along several promising technical dimensions:")
 
     add_list_item("1.", "Transformer-Based Deep Ensembles: Fine-tuning domain-specific transformer architectures (such as RoBERTa or DeBERTa) to capture contextual semantics in complex sentences.")
     add_list_item("2.", "Multilingual Opinion Auditing: Extending text parsing capabilities to regional languages (e.g., Hindi, Kannada, Spanish) to protect international consumer bases.")
@@ -711,17 +711,17 @@ def build_report():
     # ---------------------------------------------------------
     # Save the polished document
     # ---------------------------------------------------------
-    out_docs = r"C:\Users\venka\.gemini\antigravity\scratch\AIML-PROJECT-SEM3\docs\CS2227_AIML_Project_Report_TrustRate_AI.docx"
+    out_docs = r"C:\Users\venka\.gemini\antigravity\scratch\AIML-PROJECT-SEM3\docs\CS2227_AIML_Project_Report_Versight_AI.docx"
     doc.save(out_docs)
     print("Clean DOCX generated successfully at:", out_docs)
 
     # Also copy directly to Desktop (handle case where user has file currently open in Word)
-    out_desktop = r"C:\Users\venka\Desktop\CS2227_AIML_Project_Report_TrustRate_AI.docx"
+    out_desktop = r"C:\Users\venka\Desktop\CS2227_AIML_Project_Report_Versight_AI.docx"
     try:
         doc.save(out_desktop)
         print("Clean DOCX copied successfully to Desktop:", out_desktop)
     except PermissionError:
-        out_desktop_v2 = r"C:\Users\venka\Desktop\CS2227_AIML_Project_Report_TrustRate_AI_Updated.docx"
+        out_desktop_v2 = r"C:\Users\venka\Desktop\CS2227_AIML_Project_Report_Versight_AI_Updated.docx"
         doc.save(out_desktop_v2)
         print("Original Desktop file is open in Word. Saved updated file to:", out_desktop_v2)
 

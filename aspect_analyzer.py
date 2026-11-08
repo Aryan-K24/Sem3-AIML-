@@ -1,6 +1,6 @@
 """
 aspect_analyzer.py
-TrustRate AI — Product Failure Root Cause & Aspect-Based Pros/Cons Diagnostic Engine
+Versight — Product Failure Root Cause & Aspect-Based Pros/Cons Diagnostic Engine
 
 Extracts:
 1. Why a certain product fails (Root Cause Diagnostics, engineering failure modes, incidence rate, severity)

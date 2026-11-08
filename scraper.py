@@ -1,6 +1,6 @@
 """
 scraper.py
-E-Commerce URL Parser & Review Extraction Engine for TrustRate AI
+E-Commerce URL Parser & Review Extraction Engine for Versight
 
 Handles:
 1. Robust extraction of ASIN / Product ID from any Amazon URL format (path or query parameters).

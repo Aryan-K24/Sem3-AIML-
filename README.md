@@ -1,6 +1,6 @@
-# 🛡️ TrustRate AI — Electronics Review Authenticity, Failure Diagnostics & Rating Deflator
+# 🛡️ Versight — Electronics Review Authenticity, Failure Diagnostics & Rating Deflator
 
-**TrustRate AI** is an end-to-end artificial intelligence and natural language processing forensic system. It detects deceptive, sponsored, and fake reviews on electronic devices listed on e-commerce marketplaces (Amazon, BestBuy, Flipkart), recalculates the **Actual Authentic Rating**, displays the exact **Rating Inflation Delta** (e.g. Advertised: **4.50★** vs Actual: **3.80★** -> **Inflated by +0.70★**), and conducts deep **Aspect-Based Failure Diagnostics & Root Cause Analysis** directly from real customer reviews.
+**Versight** is an end-to-end artificial intelligence and natural language processing forensic system. It detects deceptive, sponsored, and fake reviews on electronic devices listed on e-commerce marketplaces (Amazon, BestBuy, Flipkart), recalculates the **Actual Authentic Rating**, displays the exact **Rating Inflation Delta** (e.g. Advertised: **4.50★** vs Actual: **3.80★** -> **Inflated by +0.70★**), and conducts deep **Aspect-Based Failure Diagnostics & Root Cause Analysis** directly from real customer reviews.
 
 ---
 
@@ -70,7 +70,7 @@ Models evaluated on held-out test split with Word (1-2) + Character (3-5) Sublin
 ## 📂 Project Structure
 
 ```
-TrustRate_AI/
+Versight/
 ├── app.py                              # Streamlit forensic dashboard & analytics UI
 ├── aspect_analyzer.py                  # Product failure root-cause & pros/cons extraction engine
 ├── gradient_descent_optimizer.py       # Calculus CIE-3 optimizer (BGD, SGD, MBGD, Gradient Ascent)

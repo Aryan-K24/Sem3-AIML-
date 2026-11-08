@@ -1,5 +1,5 @@
 """
-app.py — TrustRate AI
+app.py — Versight
 Real-Time E-Commerce Review Authenticity Engine, Rating Deflator & Failure Diagnostics
 
 Features:
@@ -35,7 +35,7 @@ METRICS_PATH = BASE / "metrics.json"
 CIE3_REPORT_PATH = BASE / "CALCULUS_CIE3_GRADIENT_DESCENT_REPORT.md"
 
 st.set_page_config(
-    page_title="TrustRate AI — E-Commerce Rating Deflator & Diagnostics",
+    page_title="Versight — E-Commerce Rating Deflator & Diagnostics",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -470,11 +470,11 @@ h_col1, h_col2 = st.columns([1, 7])
 with h_col1:
     st.markdown("<h1 style='font-size: 3.2rem; margin-bottom: 0;'>🛡️</h1>", unsafe_allow_html=True)
 with h_col2:
-    st.markdown("<h1 style='margin-bottom: 0; font-size: 2.1rem; font-weight: 700;'>TrustRate AI</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='margin-bottom: 0; font-size: 2.1rem; font-weight: 700;'>Versight</h1>", unsafe_allow_html=True)
     st.markdown("<p style='color: #94a3b8; font-size: 0.95rem; margin-top: 2px;'>E-Commerce Review Authenticity Engine, True Rating Deflator & Failure Diagnostics</p>", unsafe_allow_html=True)
 
 # Sidebar
-st.sidebar.markdown("### 🛡️ TrustRate Suite")
+st.sidebar.markdown("### 🛡️ Versight Suite")
 nav_choice = st.sidebar.radio(
     "Navigation Mode:",
     [
@@ -502,7 +502,7 @@ st.sidebar.info(
 # ---------------------------------------------------------------------------
 if nav_choice == "🌐 Live E-Commerce URL Auditor":
     st.subheader("🌐 E-Commerce Product URL Audit & Rating Deflator")
-    st.caption("Paste any Amazon or e-commerce product link. TrustRate AI matches the product or extracts reviews, runs them through the trained ML classifier to filter fake/incentivized reviews, reveals the true authentic rating, and diagnoses why the product fails.")
+    st.caption("Paste any Amazon or e-commerce product link. Versight matches the product or extracts reviews, runs them through the trained ML classifier to filter fake/incentivized reviews, reveals the true authentic rating, and diagnoses why the product fails.")
 
     st.markdown("**⚡ Quick Benchmark Presets:**")
     ex_c1, ex_c2, ex_c3, ex_c4, ex_c5 = st.columns(5)
@@ -944,4 +944,4 @@ elif nav_choice == "📊 AI Model Studio & Evaluation":
                 st.info("No words recorded.")
 
 st.divider()
-st.caption("🛡️ TrustRate AI — Machine Learning for E-Commerce Transparency and Consumer Protection.")
+st.caption("🛡️ Versight — Machine Learning for E-Commerce Transparency and Consumer Protection.")

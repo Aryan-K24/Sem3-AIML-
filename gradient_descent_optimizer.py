@@ -1,6 +1,6 @@
 """
 gradient_descent_optimizer.py
-TrustRate AI — Calculus CIE-3 Project Component: Optimization using Gradient Descent & Gradient Ascent
+Versight — Calculus CIE-3 Project Component: Optimization using Gradient Descent & Gradient Ascent
 
 This module implements:
 1. Binary Cross-Entropy Loss (Log-Loss) with L2 Regularization for Review Authenticity Classification.

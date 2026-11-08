@@ -1,6 +1,6 @@
 """
 model_utils.py
-Core utilities for TrustRate AI:
+Core utilities for Versight:
 - Hybrid ML + Linguistic forensic scoring
 - Deceptive keyword & behavioral cue extraction
 - Rating inflation calculation (Displayed vs Authentic)

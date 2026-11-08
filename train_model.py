@@ -1,6 +1,6 @@
 """
 train_model.py
-TrustRate AI — Model Training and Benchmarking Pipeline
+Versight — Model Training and Benchmarking Pipeline
 
 Trains and compares advanced text classification models:
 - Calibrated Hybrid Ensemble (Word + Char N-Grams + Calibrated Linear Classifier)
@@ -99,7 +99,7 @@ def load_training_data():
 
 def main():
     print("=" * 65)
-    print("🚀 TrustRate AI — Enhanced Review Authenticity Training Pipeline")
+    print("🚀 Versight — Enhanced Review Authenticity Training Pipeline")
     print("=" * 65)
     
     df, dataset_source = load_training_data()
