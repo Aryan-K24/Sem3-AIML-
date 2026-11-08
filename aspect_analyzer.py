@@ -496,7 +496,11 @@ def extract_aspect_sentiment_and_failures(
     # Fallback only from GENUINE organic reviews (NEVER suspicious/fake reviews, and NEVER con quotes)
     if not pros_list and genuine_high_revs:
         for r in genuine_high_revs[:2]:
-            q = _extract_targeted_clause(r["text"], ["great", "good", "love", "useful", "nice", "fast", "solid", "lasts", "clear"], is_negative_context=False)
+            clean_r = re.sub(r"Reviewed in [A-Za-z]+ on [0-9]+ [A-Za-z]+ [0-9]+.*", "", r["text"]).strip()
+            clean_r = clean_r.strip(" .;")
+            q = _extract_targeted_clause(clean_r, ["great", "good", "love", "useful", "nice", "fast", "solid", "lasts", "clear", "excellent", "phone", "device", "laptop"], is_negative_context=False)
+            if not q and len(clean_r.split()) >= 1 and not any(re.search(r"\b" + re.escape(nw) + r"\b", clean_r.lower()) for nw in NEGATIVE_CUE_WORDS):
+                q = clean_r
             if q and q not in seen_pro_quotes and q not in seen_con_quotes:
                 if not any(re.search(r"\b" + re.escape(nw) + r"\b", q.lower()) for nw in NEGATIVE_CUE_WORDS):
                     seen_pro_quotes.add(q)
@@ -504,8 +508,8 @@ def extract_aspect_sentiment_and_failures(
                         "aspect_key": "general",
                         "category": "General Performance",
                         "icon": "✨",
-                        "aspect_title": "Satisfactory Overall Performance",
-                        "sentiment_score": 85,
+                        "aspect_title": "High Customer Satisfaction & Reliability",
+                        "sentiment_score": 90,
                         "frequency": 1,
                         "evidence_quote": q,
                         "rating": int(r["rating"])
