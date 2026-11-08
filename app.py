@@ -23,7 +23,7 @@ warnings.filterwarnings("ignore")
 
 from model_utils import analyze_review_text, compute_rating_inflation, SUSPICIOUS_TRIGGER_WORDS
 from aspect_analyzer import extract_aspect_sentiment_and_failures
-from scraper import fetch_product_reviews_from_url, get_asin_db
+from scraper import fetch_product_reviews_from_url, get_asin_db, infer_advertised_rating
 from gradient_descent_optimizer import GradientDescentOptimizer, run_synthetic_benchmark
 
 BASE = Path(__file__).resolve().parent
@@ -536,14 +536,22 @@ if nav_choice == "🌐 Live E-Commerce URL Auditor":
                 placeholder="Paste any Amazon product link or ASIN (e.g. https://www.amazon.in/dp/...)",
                 key="url_input_box"
             )
+            
+        active_target = (url_input.strip() if url_input else "") or (selected_url if selected_url else "")
+        auto_detected_rating = infer_advertised_rating(active_target) if active_target else 4.5
+        
+        # Keep custom_url_rating_field in session state dynamically in sync whenever active_target changes:
+        if active_target != st.session_state.get("_last_synced_url", ""):
+            st.session_state["_last_synced_url"] = active_target
+            st.session_state["custom_url_rating_field"] = float(auto_detected_rating)
+
         with col_u2:
-            curr_str = (url_input or selected_url or "").lower()
-            preset_r = 4.7 if any(k in curr_str for k in ["iphone", "apple"]) else (4.4 if any(k in curr_str for k in ["book", "laptop", "galaxy"]) else 4.5)
+            current_field_val = st.session_state.get("custom_url_rating_field", auto_detected_rating)
             url_store_rating = st.number_input(
                 "Advertised Given Rating (★):",
                 min_value=1.0,
                 max_value=5.0,
-                value=float(preset_r),
+                value=float(current_field_val),
                 step=0.1,
                 help="The star rating displayed on the Amazon product page (e.g., 4.7★ for iPhone 17, 4.4★ for Galaxy Book4).",
                 key="custom_url_rating_field"
@@ -557,7 +565,9 @@ if nav_choice == "🌐 Live E-Commerce URL Auditor":
                 st.warning("⚠️ Please enter or paste an Amazon product URL or ASIN above to start the audit.")
             else:
                 with st.spinner("Retrieving customer reviews and running forensic NLP models..."):
-                    extracted = fetch_product_reviews_from_url(target_to_audit, catalog_list=catalog, target_rating=url_store_rating)
+                    inferred_r = infer_advertised_rating(target_to_audit)
+                    effective_target_r = url_store_rating if url_store_rating != 4.5 else inferred_r
+                    extracted = fetch_product_reviews_from_url(target_to_audit, catalog_list=catalog, target_rating=effective_target_r)
 
                 if extracted.get("status") == "captcha_blocked":
                     st.warning("🔒 **Amazon Bot Protection Active:** Amazon returned an anti-bot CAPTCHA for this request.")

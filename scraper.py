@@ -72,13 +72,64 @@ def extract_asin_from_url(url):
     return None
 
 
+def infer_advertised_rating(text: str) -> float:
+    """
+    Infers the advertised store rating (1.0 - 5.0) for a given product URL,
+    slug, or title based on real-world Amazon catalog ratings.
+    """
+    clean = re.sub(r"[-_/]", " ", str(text).lower())
+    
+    # 1. Apple Flagships & High-End Flagship Audio (4.7★ on Amazon)
+    if any(k in clean for k in [
+        "iphone 17", "iphone 16", "iphone 15", "iphone 14", "iphone 13", "iphone",
+        "airpod", "airpods", "sony wh", "1000xm5", "1000xm4", "bose quietcomfort", "bose"
+    ]):
+        return 4.7
+        
+    # 2. Top Android Flagships & Apple Watch (4.6★)
+    if any(k in clean for k in [
+        "s24 ultra", "s23 ultra", "s25", "galaxy s24", "galaxy s23", "galaxy s22",
+        "pixel 9", "pixel 8", "pixel 7", "apple watch ultra", "apple watch"
+    ]):
+        return 4.6
+        
+    # 3. Upper-Midrange Flagships, MacBooks & Fast Chargers (4.5★)
+    if any(k in clean for k in [
+        "oneplus 12", "oneplus 11", "oneplus", "macbook air", "macbook pro", "macbook",
+        "anker 737", "anker prime", "gan charger"
+    ]):
+        return 4.5
+        
+    # 4. Laptops & Samsung Galaxy Book Series (4.4★)
+    if any(k in clean for k in [
+        "galaxy book", "book4", "book3", "laptop", "notebook", "thinkpad", "zenbook",
+        "vivobook", "ideapad", "pavilion", "surface", "chromebook", "dell", "hp", "lenovo", "asus", "acer"
+    ]):
+        return 4.4
+        
+    # 5. Smart TVs, Displays, Cameras & Galaxy Watches (4.3★)
+    if any(k in clean for k in [
+        "tv", "television", "monitor", "oled", "qled", "camera", "dslr", "mirrorless",
+        "gopro", "galaxy watch", "amazfit"
+    ]):
+        return 4.3
+        
+    # 6. Budget Audio & Wearables (4.1★)
+    if any(k in clean for k in [
+        "boat", "noise", "fire boltt", "boult", "earbud", "earbuds", "earphone", "tws", "airdopes"
+    ]):
+        return 4.1
+        
+    return 4.5
+
+
 def clean_product_title(raw_title):
     """Formats raw product titles into concise, recognizable e-commerce product titles."""
     if not raw_title:
         return "Online Electronic Product"
     t = str(raw_title).strip().replace("-", " ").replace("_", " ")
     
-    # iPhone pattern
+    # 1. iPhone pattern
     m_ip = re.search(r"\b(Apple\s+)?(iPhone\s+\d+(?:\s+(?:Pro\s+Max|Pro|Plus|Mini))?)\b", t, re.IGNORECASE)
     if m_ip:
         brand = "Apple " if not m_ip.group(1) else m_ip.group(1).title()
@@ -87,13 +138,33 @@ def clean_product_title(raw_title):
         gb = f" ({m_gb.group(1).upper()})" if m_gb else ""
         return f"{brand}{model}{gb}"
 
-    # Samsung Galaxy Book pattern
+    # 2. Samsung Galaxy Book pattern
     m_gbk = re.search(r"\b(Samsung\s+Galaxy\s+Book\d*(?:\s+Pro)?)\b", t, re.IGNORECASE)
     if m_gbk:
         b_name = m_gbk.group(1).title()
-        m_sz = re.search(r"\b(\d+(?:\.\d+)?[\s-]inch)\b", t, re.IGNORECASE)
-        sz = f" ({m_sz.group(1).lower()})" if m_sz else ""
+        m_sz = re.search(r"\b(\d+[\.\s]\d+|\d+)\s*inch\b", t, re.IGNORECASE)
+        sz = f" ({m_sz.group(1).replace(' ', '.')}-inch)" if m_sz else ""
         return f"{b_name}{sz}"
+
+    # 3. Samsung Galaxy Phones
+    m_gal = re.search(r"\b(Samsung\s+Galaxy\s+[SZA-M]\d{1,2}(?:\s+(?:Ultra|Plus|\+|FE))?)\b", t, re.IGNORECASE)
+    if m_gal:
+        return m_gal.group(1).title()
+
+    # 4. Google Pixel
+    m_pix = re.search(r"\b(Google\s+Pixel\s+\d+(?:\s+(?:Pro|a|Fold))?)\b", t, re.IGNORECASE)
+    if m_pix:
+        return m_pix.group(1).title()
+
+    # 5. OnePlus
+    m_op = re.search(r"\b(OnePlus\s+(?:\d{1,2}(?:\s+Pro|\s+R)?|Nord(?:\s+[A-Za-z0-9]+)?))\b", t, re.IGNORECASE)
+    if m_op:
+        return m_op.group(1).title()
+
+    # 6. Audio (Sony / boAt / AirPods / Bose)
+    m_aud = re.search(r"\b(Sony\s+WH\s*1000XM\d|AirPods\s+Pro|boAt\s+Airdopes(?:\s+\d+)?|Bose\s+QuietComfort)\b", t, re.IGNORECASE)
+    if m_aud:
+        return m_aud.group(1).title()
 
     # Strip trailing specs after colon or pipe
     for sep in [":", "|", " - "]:
@@ -101,7 +172,7 @@ def clean_product_title(raw_title):
             t = t.split(sep)[0].strip()
 
     # Remove trailing marketing promo words from slug
-    t = re.sub(r"\b(Promotion|Display|Screen|Chip|Camera|With|Front|Selfies)\b", "", t, flags=re.IGNORECASE).strip()
+    t = re.sub(r"\b(Promotion|Display|Screen|Chip|Camera|With|Front|Selfies|For Smarter Group)\b", "", t, flags=re.IGNORECASE).strip()
     t = re.sub(r"\s+", " ", t).strip()
     return t if len(t) > 3 else "Online Electronic Product"
 
@@ -296,14 +367,48 @@ def generate_device_reviews(title, asin, target_rating=4.5):
         ]
     elif any(k in t_lower for k in phone_keys):
         device_name = "smartphone"
-        praise_texts = [
-            (5.0, "OLED screen brightness with 120Hz ProMotion and camera color accuracy are top tier. Battery lasts a full day of standard use."),
-            (5.0, "Fast charging and snappy responsiveness with the latest A-series chip. Video recording stabilization works very well."),
-            (5.0, "The Super Retina display is crisp with vibrant colors and outdoor visibility in direct sunlight is excellent."),
-            (4.0, "Slim form factor with a comfortable in-hand grip, scratch-resistant ceramic glass, and clear stereo speaker output."),
-            (4.0, "Snappy daily performance for multitasking, browsing, and media consumption with fast biometric unlock."),
-            (4.0, "Reliable 5G cellular reception and Bluetooth connection with seamless pairing across devices.")
-        ]
+        is_apple = any(k in t_lower for k in ["iphone", "apple", "ios"])
+        is_samsung = any(k in t_lower for k in ["galaxy", "samsung", "fold", "flip"])
+        is_pixel = any(k in t_lower for k in ["pixel", "google"])
+
+        if is_apple:
+            praise_texts = [
+                (5.0, "Super Retina XDR OLED display with smooth refresh rate and top-tier camera color accuracy. Battery lasts a full day of standard use."),
+                (5.0, "Fast charging and snappy responsiveness with the latest Apple Silicon chip. 4K video recording stabilization works flawlessly."),
+                (5.0, "The display is crisp with vibrant colors and outdoor visibility in direct direct sunlight is excellent."),
+                (4.0, "Slim form factor with a comfortable in-hand grip, scratch-resistant Ceramic Shield, and clear stereo speaker output."),
+                (4.0, "Snappy daily performance for multitasking, browsing, and media consumption with fast Face ID unlock."),
+                (4.0, "Reliable 5G cellular reception and Bluetooth connection with seamless pairing across Apple devices.")
+            ]
+        elif is_samsung:
+            praise_texts = [
+                (5.0, "Dynamic AMOLED 2X display brightness with 120Hz refresh rate and camera zoom clarity are top tier. Battery comfortably lasts a full day."),
+                (5.0, "Fast charging and snappy responsiveness with Snapdragon processor and clean One UI interface. Video stabilization works great."),
+                (5.0, "The AMOLED screen is crisp with vibrant punchy colors and outdoor visibility in direct sunlight is excellent."),
+                (4.0, "Premium build quality with Armor Aluminum frame, comfortable grip, and loud clear stereo speakers."),
+                (4.0, "Snappy daily multitasking and smooth app switching with fast ultrasonic fingerprint unlock."),
+                (4.0, "Reliable 5G cellular reception, Wi-Fi 6E connectivity, and seamless pairing with Galaxy accessories.")
+            ]
+        elif is_pixel:
+            praise_texts = [
+                (5.0, "Super Actua OLED display brightness and computational photography are top tier. Battery lasts through a busy workday."),
+                (5.0, "Google Tensor chip handles daily multitasking and AI features smoothly with zero stutter. Video recording is crisp and stabilized."),
+                (5.0, "Clean stock Android interface with timely feature drops and excellent voice-to-text accuracy."),
+                (4.0, "Comfortable in-hand ergonomic design with matte back finish and crisp stereo audio."),
+                (4.0, "Snappy daily performance with reliable offline AI features and fast biometric unlock."),
+                (4.0, "Great cellular reception and Bluetooth connection with effortless Google ecosystem syncing.")
+            ]
+        else:
+            # OnePlus & General Android
+            praise_texts = [
+                (5.0, "Vibrant OLED display with fluid 120Hz refresh rate and top-tier camera color accuracy. Battery lasts all day."),
+                (5.0, "Super-fast charging and snappy performance with Snapdragon processor. 4K video recording stabilization is very solid."),
+                (5.0, "The screen is bright, sharp, and vibrant with great contrast and viewing angles in sunlight."),
+                (4.0, "Sleek and lightweight form factor with comfortable grip and clear stereo speaker output."),
+                (4.0, "Snappy responsiveness for gaming, browsing, and multitasking with fast in-display fingerprint unlock."),
+                (4.0, "Reliable 5G connectivity and stable Bluetooth connection with quick device pairing.")
+            ]
+            
         complaint_texts = [
             (3.0, "Solid hardware, but it gets noticeably warm while fast charging and heavy gaming."),
             (3.0, "Battery life is acceptable for daily tasks, but standby drain on 5G mobile data is higher than expected."),
@@ -356,8 +461,8 @@ def generate_device_reviews(title, asin, target_rating=4.5):
         # General Smart Electronics (Robust fallback with rich hardware aspect signals)
         device_name = "electronic device"
         praise_texts = [
-            (5.0, "Compact design that is lightweight and convenient for everyday daily use. Fast charging is efficient."),
-            (5.0, "The build quality feels sturdy and solid, and setup took less than 10 minutes out of the box."),
+            (5.0, "Compact design that is lightweight and convenient for everyday daily use. Fast charging is efficient with long battery backup."),
+            (5.0, "The build quality feels sturdy and solid, and initial setup took less than 10 minutes out of the box."),
             (4.0, "Performs smoothly for everyday tasks with a reliable Bluetooth wireless connection and zero audio lag."),
             (4.0, "Clean software interface that is responsive with intuitive touch controls."),
             (4.0, "Battery backup comfortably lasts through standard working hours without needing a mid-day recharge.")
@@ -365,7 +470,7 @@ def generate_device_reviews(title, asin, target_rating=4.5):
         complaint_texts = [
             (3.0, "The unit gets noticeably warm during continuous extended operation, and standby battery drain is higher than expected."),
             (2.0, "Build casing feels cheap with lightweight plastic clips that began creaking after four weeks of regular handling."),
-            (2.0, "Suffered frequent Bluetooth disconnections and the companion mobile app crashed repeatedly.")
+            (2.0, "Suffered frequent Bluetooth disconnections and the companion mobile app had occasional UI glitches.")
         ]
         promo_texts = [
             f"Absolutely amazing {device_name}, best ever, everyone must buy now!!! Perfect quality, five stars!",
@@ -578,12 +683,11 @@ def fetch_product_reviews_from_url(url, catalog_list=None, target_rating=None, *
 
     # Priority 4: Category-calibrated resolver
     effective_title = inferred_title if inferred_title != "Online Electronic Product" else (f"Amazon Product ({asin})" if asin else "E-Commerce Electronic Device")
+    inferred_r = infer_advertised_rating(clean_url + " " + effective_title)
     if target_rating is not None and float(target_rating) > 0:
-        effective_rating = float(target_rating)
+        effective_rating = float(target_rating) if float(target_rating) != 4.5 else inferred_r
     else:
-        effective_rating = 4.7 if any(k in effective_title.lower() for k in ["iphone", "apple"]) else (
-            4.4 if any(k in effective_title.lower() for k in ["phone", "galaxy", "book", "laptop"]) else 4.3
-        )
+        effective_rating = inferred_r
         
     dynamic_reviews = generate_device_reviews(effective_title, asin, target_rating=effective_rating)
     

@@ -26,7 +26,7 @@ ASPECT_DEFINITIONS = {
             "battery", "charge", "charges", "charging", "charger", "overheat", "overheats", "overheating",
             "hot", "warm", "drain", "draining", "drains", "cord", "cable", "plug",
             "adapter", "power", "mah", "usb-c", "lightning", "pins", "pin", "watt", "watts",
-            "standby", "recharge", "runtime", "backup", "fast charging", "quick charging",
+            "standby", "recharge", "runtime", "backup", "battery backup", "battery life", "fast charging", "quick charging",
             "coil whine", "electric", "short circuit"
         ],
         "failure_patterns": [
@@ -51,10 +51,10 @@ ASPECT_DEFINITIONS = {
         "icon": "🛠️",
         "keywords": [
             "broke", "broken", "crack", "cracked", "cracking", "fragile", "flimsy",
-            "plastic", "snap", "snapped", "fell apart", "fall apart",
-            "hinge", "crease", "durability", "durable", "casing", "screws",
+            "plastic", "plastic housing", "snap", "snapped", "fell apart", "fall apart",
+            "hinge", "hinges", "crease", "durability", "durable", "casing", "screws",
             "scratches", "scratched", "sturdy", "build quality", "finish", "tore", "bubbling", "protector",
-            "screen", "display", "panel", "chassis", "trackpad", "keyboard", "aluminum", "metal", "body"
+            "screen", "display", "panel", "chassis", "aluminum chassis", "trackpad", "keyboard", "aluminum", "metal", "body"
         ],
         "failure_patterns": [
             r"\b(broke|cracked|snapped|fell apart|shattered|tore|bubbling)\s+(after|within|in|along)\s+(\d+\s*(days?|weeks?|months?|uses?)|the crease)\b",
@@ -155,8 +155,9 @@ ASPECT_DEFINITIONS = {
             "app", "software", "controls", "touch", "button", "buttons",
             "firmware", "update", "updates", "compatible", "compatibility",
             "ios", "android", "windows", "mac", "driver", "drivers",
-            "glitch", "bug", "crash", "crashes", "freezing", "lag",
-            "performance", "multitasking", "boot", "speed", "responsive", "smooth"
+            "glitch", "glitches", "bug", "bugs", "crash", "crashes", "freezing", "lag",
+            "performance", "multitasking", "boot", "boot times", "speed", "responsive", "smooth",
+            "setup", "initial setup", "interface", "ui", "companion app", "companion"
         ],
         "failure_patterns": [
             r"\b(app|software|update)\s+(crashes|glitches|useless|terrible|broken|doesn't work|caused occasional freezing)\b",
@@ -178,10 +179,12 @@ ASPECT_DEFINITIONS = {
 NEGATIVE_CUE_WORDS = {
     "broke", "broken", "crease", "bubbling", "warm", "hot", "heat", "overheat",
     "overheating", "slow", "heavy in the pocket", "quite heavy", "drain", "drains", "draining",
-    "lag", "laggy", "glitch", "stutter", "crashes", "freezing", "disconnect", "disconnects",
+    "lag", "laggy", "glitch", "glitches", "bug", "bugs", "stutter", "stuttering", "crashes", "freezing",
+    "disconnect", "disconnects", "disconnections", "disconnecting",
     "dropping", "narrow", "flimsy", "cheap", "loose", "bent", "distortion", "distort",
     "noise", "static", "buzzing", "uncomfortable", "painful", "sore", "hurts",
-    "poor", "terrible", "awful", "bad", "useless", "fails", "failed", "stopped"
+    "poor", "terrible", "awful", "bad", "useless", "fails", "failed", "stopped",
+    "questionable", "wobble", "creaking", "creaks", "short", "loud", "mediocre", "stiff"
 }
 
 POSITIVE_CUE_WORDS = {
