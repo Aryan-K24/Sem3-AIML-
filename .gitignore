@@ -9,3 +9,5 @@ __pycache__/
 *.joblib
 !model.joblib
 !data/curated_training_dataset.csv
+Versight_Standalone_App/
+*.zip

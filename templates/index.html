@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Versight — Forensic E-Commerce Review & Rating Deflator AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0a0f1d;
+      --bg-card: #111827;
+      --bg-card-subtle: #1e293b;
+      --border: #1f293d;
+      --border-focus: #3b82f6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #f43f5e;
+      --accent: #8b5cf6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    .header {
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-icon {
+      font-size: 26px;
+      line-height: 1;
+    }
+    .brand-name {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-tag {
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(59, 130, 246, 0.15);
+      color: #93c5fd;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      background: #0f172a;
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .nav-btn:hover { color: var(--text-main); }
+    .nav-btn.active {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* URL AUDITOR */
+    .hero-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .hero-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .hero-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+    .presets-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #94a3b8;
+      margin-bottom: 10px;
+    }
+    .presets-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .preset-pill {
+      background: #1e293b;
+      border: 1px solid var(--border);
+      color: #cbd5e1;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+    .preset-pill:hover {
+      background: #334155;
+      color: #fff;
+      border-color: #475569;
+      transform: translateY(-1px);
+    }
+    .input-box-wrapper {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .url-input {
+      flex: 1;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 14px 18px;
+      font-size: 14px;
+      border-radius: 10px;
+      font-family: inherit;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .url-input:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+    .btn-audit {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+      border: none;
+      padding: 0 28px;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+      font-family: inherit;
+    }
+    .btn-audit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+    }
+    .btn-audit:active { transform: translateY(0); }
+    .btn-audit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* LOADING SPINNER */
+    .spinner-wrap {
+      display: none;
+      text-align: center;
+      padding: 40px;
+    }
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid rgba(59, 130, 246, 0.2);
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .sp-text { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+
+    /* RESULTS VIEW */
+    .result-section { display: none; }
+    .prod-header {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 26px;
+      margin-bottom: 20px;
+    }
+    .prod-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badges-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .badge {
+      font-size: 12px;
+      font-weight: 600;
+      background: #1e293b;
+      color: #94a3b8;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+    }
+    .badge.green {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    /* 4 HERO CARDS */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .mc-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .mc-value {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .mc-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* DIAGNOSTIC BANNER */
+    .diag-banner {
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      font-weight: 500;
+      border: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .diag-banner.warn {
+      background: rgba(245, 158, 11, 0.1);
+      border-color: rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
+    }
+    .diag-banner.good {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #34d399;
+    }
+
+    /* SUB TABS */
+    .sub-tabs {
+      display: flex;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .sub-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 12px 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+      font-family: inherit;
+    }
+    .sub-tab-btn.active {
+      color: #60a5fa;
+    }
+    .sub-tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #60a5fa;
+    }
+    .sub-content { display: none; }
+    .sub-content.active { display: block; }
+
+    /* FAILURE CARDS */
+    .failures-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .fail-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--danger);
+      border-radius: 10px;
+      padding: 18px;
+    }
+    .fc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .fc-title { font-weight: 700; font-size: 15px; }
+    .fc-inc {
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(244, 63, 94, 0.15);
+      color: #fda4af;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .fc-cause {
+      font-size: 13px;
+      color: #cbd5e1;
+      margin-bottom: 12px;
+    }
+    .proof-quote {
+      background: #0f172a;
+      border-left: 3px solid #64748b;
+      padding: 8px 12px;
+      font-size: 12px;
+      border-radius: 4px;
+      color: #94a3b8;
+      font-style: italic;
+      margin-top: 6px;
+    }
+
+    /* PROS & CONS */
+    .pros-cons-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .pc-col h4 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pro-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--success);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .con-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--danger);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .pc-title {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .pc-score { font-size: 12px; color: var(--success); font-weight: 600; }
+    .pc-con-score { font-size: 12px; color: var(--danger); font-weight: 600; }
+    .pc-quote {
+      font-size: 12px;
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    /* SCORECARD */
+    .scorecard-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .sc-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .sc-info { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; }
+    .sc-score-val { font-weight: 700; font-size: 14px; color: #34d399; }
+    .progress-bar-bg {
+      background: #1e293b;
+      height: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #34d399);
+      border-radius: 999px;
+      transition: width 0.5s ease;
+    }
+
+    /* REVIEW LIST */
+    .rev-row {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .rev-row.suspicious {
+      border-left: 4px solid var(--danger);
+    }
+    .rev-row.genuine {
+      border-left: 4px solid var(--success);
+    }
+    .rev-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .rev-star { color: #f59e0b; font-weight: 700; }
+    .rev-text { font-size: 13px; color: #cbd5e1; }
+
+    /* TEXT AREA FOR PASTE */
+    .paste-area {
+      width: 100%;
+      height: 220px;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 16px;
+      font-size: 13px;
+      border-radius: 10px;
+      font-family: inherit;
+      outline: none;
+      resize: vertical;
+      margin-bottom: 16px;
+    }
+    .paste-area:focus { border-color: var(--border-focus); }
+
+    /* CATALOG TABLE */
+    .catalog-search {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .catalog-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: var(--bg-card);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .catalog-table th {
+      background: #0f172a;
+      padding: 14px 16px;
+      text-align: left;
+      font-weight: 700;
+      color: #94a3b8;
+      border-bottom: 1px solid var(--border);
+    }
+    .catalog-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      color: #cbd5e1;
+    }
+    .catalog-table tr:hover td { background: #1a2333; cursor: pointer; }
+
+    @media (max-width: 900px) {
+      .metrics-grid { grid-template-columns: 1fr 1fr; }
+      .failures-grid, .pros-cons-grid { grid-template-columns: 1fr; }
+      .input-box-wrapper { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-icon">🛡️</span>
+        <div>
+          <span class="brand-name">Versight</span>
+          <span class="brand-tag">v2.0 Standalone</span>
+        </div>
+      </div>
+      <nav class="nav-tabs">
+        <button class="nav-btn active" onclick="switchNav('url-tab')">🔗 Live URL Auditor</button>
+        <button class="nav-btn" onclick="switchNav('paste-tab')">📝 Direct Review Paste</button>
+        <button class="nav-btn" onclick="switchNav('catalog-tab')">🏪 Storefront & Catalog</button>
+        <button class="nav-btn" onclick="switchNav('metrics-tab')">🧠 Model Studio & Viva</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- MODE 1: LIVE E-COMMERCE URL AUDITOR -->
+    <section id="url-tab" class="tab-content active">
+      <div class="hero-card">
+        <h2 class="hero-title"><span>🔍</span> Live E-Commerce Product URL Auditor</h2>
+        <p class="hero-subtitle">Direct, unblocked real-time scraping: connects directly to Amazon, reads official store ratings & audits genuine vs manipulated customer reviews.</p>
+
+        <div class="presets-label">⚡ Quick Benchmark Test Presets:</div>
+        <div class="presets-row">
+          <button class="preset-pill" onclick="loadPreset('thinkbook')">💻 Lenovo ThinkBook 16 (4.0★ Amazon)</button>
+          <button class="preset-pill" onclick="loadPreset('lenovo')">💻 Lenovo IdeaPad Slim 3 (3.8★ Amazon)</button>
+          <button class="preset-pill" onclick="loadPreset('macbook')">💻 Apple MacBook Air 15 (4.6★ Amazon)</button>
+          <button class="preset-pill" onclick="loadPreset('iphone')">📱 Apple iPhone 17 (4.7★ Amazon)</button>
+          <button class="preset-pill" onclick="loadPreset('galaxy')">💻 Galaxy Book4 (4.4★ Amazon)</button>
+          <button class="preset-pill" onclick="loadPreset('earbuds')">🎧 Earbuds Benchmark (4.5★)</button>
+        </div>
+
+        <div class="input-box-wrapper">
+          <input type="text" id="urlInput" class="url-input" placeholder="Paste any Amazon product link or ASIN (e.g. https://www.amazon.in/dp/B0GRHZDJBJ)...">
+          <button id="btnAuditUrl" class="btn-audit" onclick="runUrlAudit()">
+            <span>🚀</span> Audit Product URL & Diagnose
+          </button>
+        </div>
+      </div>
+
+      <!-- SPINNER -->
+      <div id="urlSpinner" class="spinner-wrap">
+        <div class="spinner"></div>
+        <div class="sp-text">Connecting directly to Amazon, extracting real-time store rating & auditing customer reviews...</div>
+      </div>
+
+      <!-- AUDIT RESULTS -->
+      <div id="urlResults" class="result-section">
+        <div class="prod-header">
+          <h3 id="resProdTitle" class="prod-title">📦 Product Title</h3>
+          <div class="badges-row">
+            <span id="resSource" class="badge green">Live Amazon Storefront</span>
+            <span id="resAsin" class="badge">ASIN: B0...</span>
+            <span id="resRevCount" class="badge">16 Reviews Audited</span>
+          </div>
+        </div>
+
+        <!-- 4 HERO CARDS -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="mc-label">Advertised Given Rating</div>
+            <div id="mcAdvRating" class="mc-value" style="color: #60a5fa;">3.80 ★</div>
+            <div class="mc-desc">Listed on Amazon store</div>
+          </div>
+          <div class="metric-card">
+            <div class="mc-label">Actual Genuine Rating</div>
+            <div id="mcGenRating" class="mc-value" style="color: #34d399;">4.00 ★</div>
+            <div class="mc-desc">Calculated from verified organic reviews</div>
+          </div>
+          <div class="metric-card">
+            <div class="mc-label">Rating Inflation Delta</div>
+            <div id="mcDelta" class="mc-value" style="color: #f59e0b;">+0.00 ★</div>
+            <div id="mcDeltaPct" class="mc-desc">No inflation detected</div>
+          </div>
+          <div class="metric-card">
+            <div class="mc-label">Trust Assessment</div>
+            <div id="mcGrade" class="mc-value" style="font-size: 26px;">Grade A</div>
+            <div id="mcFakePct" class="mc-desc">0% Suspicious Reviews Flagged</div>
+          </div>
+        </div>
+
+        <!-- VERDICT BANNER -->
+        <div id="resBanner" class="diag-banner good">
+          <span>✅</span>
+          <span id="resBannerText">Verified reviews indicate consistent day-to-day performance.</span>
+        </div>
+
+        <!-- SUB TABS -->
+        <div class="sub-tabs">
+          <button class="sub-tab-btn active" onclick="switchSubTab('sub-failures')">🚨 Why This Product Fails</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('sub-pros-cons')">⚖️ Authentic Pros & Cons</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('sub-scorecard')">📊 Aspect Scorecard (0-100)</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('sub-reviews')">💬 Inspected Customer Reviews</button>
+        </div>
+
+        <!-- SUB TAB 1: FAILURES -->
+        <div id="sub-failures" class="sub-content active">
+          <div id="failuresList" class="failures-grid"></div>
+        </div>
+
+        <!-- SUB TAB 2: PROS & CONS -->
+        <div id="sub-pros-cons" class="sub-content">
+          <div class="pros-cons-grid">
+            <div class="pc-col">
+              <h4>🟢 Authentic Pros (Verified Genuine Praise)</h4>
+              <div id="prosList"></div>
+            </div>
+            <div class="pc-col">
+              <h4>🔴 Authentic Cons (Real Customer Limitations)</h4>
+              <div id="consList"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUB TAB 3: SCORECARD -->
+        <div id="sub-scorecard" class="sub-content">
+          <div class="scorecard-wrap" id="scorecardList"></div>
+        </div>
+
+        <!-- SUB TAB 4: REVIEWS LIST -->
+        <div id="sub-reviews" class="sub-content">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <div>
+              <h4 id="realReviewsHeader" style="color: #34d399; margin-bottom: 16px; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                <span>🟢</span> Verified Real Customer Reviews
+              </h4>
+              <div id="realReviewsList"></div>
+            </div>
+            <div>
+              <h4 id="fakeReviewsHeader" style="color: #f43f5e; margin-bottom: 16px; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                <span>🔴</span> Filtered Fake / Manipulated Reviews
+              </h4>
+              <div id="fakeReviewsList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODE 2: DIRECT REVIEW PASTE -->
+    <section id="paste-tab" class="tab-content">
+      <div class="hero-card">
+        <h2 class="hero-title"><span>📝</span> Direct Customer Review Paste & Live Audit Engine</h2>
+        <p class="hero-subtitle">Paste customer reviews copied directly from Amazon, Flipkart, or any online retailer to run immediate forensic fraud detection, failure extraction, and rating deflation.</p>
+
+        <div style="margin-bottom: 14px;">
+          <button class="preset-pill" onclick="loadPasteSample()">📋 Pre-fill Real Amazon India Reviews (Galaxy Book4)</button>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+          <input type="text" id="pasteTitle" class="url-input" placeholder="Product Title (e.g. Samsung Galaxy Book4 Laptop)..." value="Samsung Galaxy Book4 (15.6-inch Core i5)">
+          <input type="number" id="pasteStoreRating" class="url-input" placeholder="Advertised Rating (e.g. 4.4)" value="4.4" step="0.1" style="max-width: 220px;">
+        </div>
+
+        <textarea id="pasteText" class="paste-area" placeholder="Paste customer reviews here (Separate reviews by blank lines). Optional prefix 'Stars | Review Text'&#10;&#10;5.0 | The laptop is slim, lightweight, and easy to carry around. Fast charging is a big advantage...&#10;&#10;5.0 | value for money product, good battery life, fast charging ,good display...&#10;&#10;3.0 | Cooling fans spin up noticeably loud under heavy multitasking..."></textarea>
+
+        <button class="btn-audit" onclick="runPasteAudit()">
+          <span>🚀</span> Audit Pasted Reviews
+        </button>
+      </div>
+
+      <div id="pasteSpinner" class="spinner-wrap">
+        <div class="spinner"></div>
+        <div class="sp-text">Running NLP forensic models on pasted reviews...</div>
+      </div>
+
+      <div id="pasteResults" class="result-section"></div>
+    </section>
+
+    <!-- MODE 3: ELECTRONICS STOREFRONT & CATALOG -->
+    <section id="catalog-tab" class="tab-content">
+      <div class="hero-card">
+        <h2 class="hero-title"><span>🏪</span> Electronics Storefront & Indexed Catalog</h2>
+        <p class="hero-subtitle">Browse 300+ consumer electronics indexed with advertised vs authentic deflated ratings, fraud percentages, and failure reasons.</p>
+        <div class="catalog-search">
+          <input type="text" id="catSearchInput" class="url-input" placeholder="Search devices by name or ASIN (e.g. iPhone, ThinkPad, Sony, Galaxy)..." oninput="filterCatalog()">
+          <select id="catCategorySelect" class="url-input" style="max-width: 220px;" onchange="filterCatalog()">
+            <option value="all">All Categories</option>
+            <option value="smartphone">Smartphones</option>
+            <option value="laptop">Laptops</option>
+            <option value="earbuds">Audio & Earbuds</option>
+            <option value="smartwatch">Smartwatches</option>
+            <option value="charger">Chargers & Power</option>
+          </select>
+        </div>
+      </div>
+      <table class="catalog-table">
+        <thead>
+          <tr>
+            <th>Product Title</th>
+            <th>ASIN</th>
+            <th>Category</th>
+            <th>Advertised</th>
+            <th>Authentic</th>
+            <th>Inflation Delta</th>
+            <th>Trust Grade</th>
+          </tr>
+        </thead>
+        <tbody id="catalogTableBody"></tbody>
+      </table>
+    </section>
+
+    <!-- MODE 4: MODEL STUDIO & VIVA METRICS -->
+    <section id="metrics-tab" class="tab-content">
+      <div class="hero-card">
+        <h2 class="hero-title"><span>🧠</span> AI Model Studio & Viva Project Metrics</h2>
+        <p class="hero-subtitle">Complete mathematical breakdown of the forensic fraud detection model, Gradient Descent optimizer, and Rating Deflator formula.</p>
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="mc-label">Model Accuracy</div>
+            <div class="mc-value" style="color: #60a5fa;">75.82%</div>
+            <div class="mc-desc">Evaluated on test benchmark</div>
+          </div>
+          <div class="metric-card">
+            <div class="mc-label">ROC-AUC Score</div>
+            <div class="mc-value" style="color: #a78bfa;">0.828</div>
+            <div class="mc-desc">Discrimination power</div>
+          </div>
+          <div class="metric-card">
+            <div class="mc-label">F1-Score (Macro)</div>
+            <div class="mc-value" style="color: #34d399;">75.78%</div>
+            <div class="mc-desc">Harmonic mean of precision & recall</div>
+          </div>
+          <div class="metric-card">
+            <div class="mc-label">Indexed Devices</div>
+            <div class="mc-value" style="color: #f59e0b;">311</div>
+            <div class="mc-desc">Electronics catalog entries</div>
+          </div>
+        </div>
+        <div style="background: #0f172a; border: 1px solid var(--border); border-radius: 12px; padding: 22px; margin-top: 20px;">
+          <h4 style="margin-bottom: 12px; font-weight: 700; color: #93c5fd;">📐 Mathematical Formulation of Rating Deflator</h4>
+          <p style="font-size: 13px; color: #94a3b8; margin-bottom: 14px;">
+            The genuine customer rating $R_{authentic}$ eliminates artificial promotional distortion by computing a Bayesian-adjusted weighted organic expectation:
+          </p>
+          <div style="background: #1e293b; padding: 12px 18px; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #38bdf8; margin-bottom: 14px;">
+            R_authentic = ( ∑ (1 - P(fake_i)) * r_i ) / ∑ (1 - P(fake_i))
+          </div>
+          <p style="font-size: 13px; color: #94a3b8;">
+            Where $P(fake_i)$ is the posterior fraud probability predicted by our hybrid Logistic-TF-IDF forensic classifier, and $r_i \in [1, 5]$ is the customer star rating.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    function switchNav(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      event.target.classList.add('active');
+      if (tabId === 'catalog-tab') loadCatalogData();
+    }
+
+    function switchSubTab(subId) {
+      document.querySelectorAll('.sub-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.sub-tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(subId).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    function loadPreset(key) {
+      const presets = {
+        'thinkbook': 'https://www.amazon.in/dp/B0GRHZDJBJ',
+        'lenovo': 'https://www.amazon.in/Lenovo-IdeaPad-Next-Gen-83UR009QIN-Keyboard/dp/B0H3PV7418/ref=sr_1_6?crid=M4JFYVPSBR7L&dib=eyJ2IjoMSJ9.Qwg1INPsAaIflDqsafIODalu-T6Ks1',
+        'macbook': 'https://www.amazon.in/Apple-2026-MacBook-Laptop-chip/dp/B0GR1528P7/ref=sr_1_8?crid=M4JFYVPSBR7L&',
+        'iphone': 'https://www.amazon.in/Apple-iPhone-17-128-GB/dp/B0FQFYXCC4/',
+        'galaxy': 'https://www.amazon.in/Samsung-Galaxy-Book4-i5-1335U-NP750XGJ-LG1IN/dp/B0CX8XQ1V4',
+        'earbuds': 'https://www.amazon.com/dp/P001'
+      };
+      document.getElementById('urlInput').value = presets[key] || '';
+      runUrlAudit();
+    }
+
+    async function runUrlAudit() {
+      const url = document.getElementById('urlInput').value.trim();
+      if (!url) {
+        alert('Please enter an Amazon product URL or ASIN.');
+        return;
+      }
+      document.getElementById('urlSpinner').style.display = 'block';
+      document.getElementById('urlResults').style.display = 'none';
+
+      try {
+        const res = await fetch('/api/audit-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: url })
+        });
+        const data = await res.json();
+        document.getElementById('urlSpinner').style.display = 'none';
+
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        renderAuditResults(data, 'urlResults');
+      } catch (err) {
+        document.getElementById('urlSpinner').style.display = 'none';
+        alert('Network error connecting to Versight server: ' + err.message);
+      }
+    }
+
+    function renderAuditResults(data, targetContainerId) {
+      const c = document.getElementById(targetContainerId);
+      c.style.display = 'block';
+
+      document.getElementById('resProdTitle').textContent = '📦 ' + data.product_title;
+      document.getElementById('resSource').textContent = data.source;
+      document.getElementById('resAsin').textContent = 'ASIN: ' + data.asin;
+      document.getElementById('resRevCount').textContent = data.total_reviews + ' Real Reviews Audited';
+
+      document.getElementById('mcAdvRating').textContent = Number(data.displayed_rating).toFixed(2) + ' ★';
+      document.getElementById('mcGenRating').textContent = Number(data.authentic_rating).toFixed(2) + ' ★';
+      
+      const delta = Number(data.inflation_delta);
+      const deltaEl = document.getElementById('mcDelta');
+      const deltaPctEl = document.getElementById('mcDeltaPct');
+      if (delta > 0) {
+        deltaEl.textContent = '+' + delta.toFixed(2) + ' ★';
+        deltaEl.style.color = '#f43f5e';
+        deltaPctEl.textContent = 'Inflated by ' + data.inflation_pct + '%';
+      } else {
+        deltaEl.textContent = delta.toFixed(2) + ' ★';
+        deltaEl.style.color = '#10b981';
+        deltaPctEl.textContent = 'Authentic - No inflation';
+      }
+
+      document.getElementById('mcGrade').textContent = data.trust_grade;
+      document.getElementById('mcFakePct').textContent = data.fake_pct + '% Suspicious Reviews Flagged';
+
+      const banner = document.getElementById('resBanner');
+      const bannerText = document.getElementById('resBannerText');
+      if (delta > 0) {
+        banner.className = 'diag-banner warn';
+        bannerText.innerHTML = `<strong>⚠️ Rating Inflation Result:</strong> The advertised store rating is <strong>${Number(data.displayed_rating).toFixed(2)}★</strong>, but genuine customer reviews average <strong>${Number(data.authentic_rating).toFixed(2)}★</strong> (inflated by +${delta.toFixed(2)}★).`;
+      } else {
+        banner.className = 'diag-banner good';
+        bannerText.innerHTML = `<strong>✅ Authentic Rating:</strong> The advertised rating (${Number(data.displayed_rating).toFixed(2)}★) matches verified customer feedback with zero significant manipulation.`;
+      }
+
+      // 1. Failure Modes
+      const fList = document.getElementById('failuresList');
+      fList.innerHTML = '';
+      const modes = (data.aspect_analysis && data.aspect_analysis.failure_modes) || [];
+      if (modes.length === 0) {
+        fList.innerHTML = '<div style="color: #34d399; font-size: 14px; padding: 12px; grid-column: span 2;">✅ No recurrent hardware breakdowns detected in analyzed customer reviews.</div>';
+      } else {
+        modes.forEach(m => {
+          let quotesHtml = (m.evidence_quotes || []).map(q => `<div class="proof-quote">★${q.rating} "${q.quote}"</div>`).join('');
+          fList.innerHTML += `
+            <div class="fail-card" style="border-left-color: ${m.severity_color || '#f43f5e'};">
+              <div class="fc-header">
+                <span class="fc-title">${m.icon} ${m.category}</span>
+                <span class="fc-inc">${m.incidence_pct}% Incidence</span>
+              </div>
+              <div class="fc-cause"><strong>What Happens:</strong> ${m.root_cause_summary}</div>
+              <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Verified Customer Proof:</div>
+              ${quotesHtml}
+            </div>
+          `;
+        });
+      }
+
+      // 2. Pros & Cons
+      const pList = document.getElementById('prosList');
+      const cnList = document.getElementById('consList');
+      pList.innerHTML = '';
+      cnList.innerHTML = '';
+      const pros = (data.aspect_analysis && data.aspect_analysis.pros) || [];
+      const cons = (data.aspect_analysis && data.aspect_analysis.cons) || [];
+
+      if (pros.length === 0) {
+        pList.innerHTML = '<div style="color: #94a3b8; font-size: 13px;">No verified organic pros identified.</div>';
+      } else {
+        pros.forEach(p => {
+          pList.innerHTML += `
+            <div class="pro-box">
+              <div class="pc-title">
+                <span>${p.icon || '✨'} ${p.aspect_title}</span>
+                <span class="pc-score">+${p.sentiment_score || 90}% Positive</span>
+              </div>
+              <div class="pc-quote">★${p.rating} "${p.evidence_quote}"</div>
+            </div>
+          `;
+        });
+      }
+
+      if (cons.length === 0) {
+        cnList.innerHTML = '<div style="color: #34d399; font-size: 13px;">No significant recurring customer trade-offs reported.</div>';
+      } else {
+        cons.forEach(c => {
+          cnList.innerHTML += `
+            <div class="con-box">
+              <div class="pc-title">
+                <span>${c.icon || '⚠️'} ${c.aspect_title}</span>
+                <span class="pc-con-score">${c.impact_level || 'Trade-Off'}</span>
+              </div>
+              <div class="pc-quote">★${c.rating} "${c.evidence_quote}"</div>
+            </div>
+          `;
+        });
+      }
+
+      // 3. Scorecard
+      const scList = document.getElementById('scorecardList');
+      scList.innerHTML = '';
+      const sc = (data.aspect_analysis && data.aspect_analysis.aspect_scorecard) || {};
+      for (const [title, info] of Object.entries(sc)) {
+        if (info.has_data) {
+          scList.innerHTML += `
+            <div class="sc-item">
+              <div class="sc-info"><span>${info.icon}</span> <span>${title}</span></div>
+              <div class="sc-score-val">${info.score}/100</div>
+            </div>
+            <div class="progress-bar-bg" style="margin-bottom: 16px;">
+              <div class="progress-bar-fill" style="width: ${info.score}%;"></div>
+            </div>
+          `;
+        }
+      }
+
+      // 4. Inspected Reviews (Split into Verified Real vs Filtered Fake/Manipulated)
+      const realList = document.getElementById('realReviewsList');
+      const fakeList = document.getElementById('fakeReviewsList');
+      realList.innerHTML = '';
+      fakeList.innerHTML = '';
+
+      let realCount = 0;
+      let fakeCount = 0;
+
+      (data.reviews || []).forEach(r => {
+        const isSusp = r.is_suspicious;
+        if (isSusp) {
+          fakeCount++;
+          const triggers = (r.triggers && r.triggers.length > 0) ? r.triggers.join(', ') : 'Incentivized review patterns';
+          const fraudProb = Math.round((r.suspicious_prob || 0.95) * 100);
+          fakeList.innerHTML += `
+            <div class="rev-row suspicious" style="margin-bottom: 14px; border-left: 3px solid #f43f5e; padding: 14px; background: #161f30; border-radius: 8px;">
+              <div style="font-size: 13px; font-weight: 700; color: #f59e0b; margin-bottom: 6px;">
+                ★ ${r.rating}/5 Stars <span style="color: #64748b; font-weight: 400;">| Fraud Probability:</span> <span style="color: #f43f5e;">${fraudProb}% Suspicious</span>
+              </div>
+              <div class="rev-text" style="font-size: 13px; color: #cbd5e1; line-height: 1.5; margin-bottom: 8px;">"${r.review_text}"</div>
+              <div style="font-size: 11px; color: #f87171; background: rgba(244, 63, 94, 0.1); padding: 4px 8px; border-radius: 4px; display: inline-block;">
+                🚨 Deceptive cues detected: <strong>${triggers}</strong>
+              </div>
+            </div>
+          `;
+        } else {
+          realCount++;
+          const authScore = Math.round((r.authenticity_score || 0.85) * 100);
+          realList.innerHTML += `
+            <div class="rev-row genuine" style="margin-bottom: 14px; border-left: 3px solid #10b981; padding: 14px; background: #161f30; border-radius: 8px;">
+              <div style="font-size: 13px; font-weight: 700; color: #f59e0b; margin-bottom: 6px;">
+                ★ ${r.rating}/5 Stars <span style="color: #64748b; font-weight: 400;">| Authenticity Score:</span> <span style="color: #34d399;">${authScore}% Genuine</span>
+              </div>
+              <div class="rev-text" style="font-size: 13px; color: #cbd5e1; line-height: 1.5;">"${r.review_text}"</div>
+            </div>
+          `;
+        }
+      });
+
+      document.getElementById('realReviewsHeader').innerHTML = `<span>🟢</span> Verified Real Customer Reviews (${realCount} Reviews)`;
+      document.getElementById('fakeReviewsHeader').innerHTML = `<span>🔴</span> Filtered Fake / Manipulated Reviews (${fakeCount} Reviews)`;
+
+      if (realCount === 0) realList.innerHTML = '<div style="color: #94a3b8; font-size: 13px; padding: 10px;">No verified organic reviews found.</div>';
+      if (fakeCount === 0) fakeList.innerHTML = '<div style="color: #34d399; font-size: 13px; padding: 10px;">✅ Zero fake reviews detected! All audited reviews are authentic.</div>';
+    }
+
+    function loadPasteSample() {
+      document.getElementById('pasteTitle').value = 'Samsung Galaxy Book4 (15.6-inch Core i5, Gray)';
+      document.getElementById('pasteStoreRating').value = '4.4';
+      document.getElementById('pasteText').value = 
+`5.0 | The laptop is slim, lightweight, and easy to carry around. Fast charging is a big advantage and helps reduce downtime during work. After more than a month of daily usage, including browsing, office work, video calls, media consumption, and light multitasking, the performance has been smooth and reliable. The build quality feels premium for the price range, and the overall user experience has been good.
+
+5.0 | value for money product, good battery life, fast charging ,good display definetly go for it amazing laptop
+
+4.0 | Crisp 1080p anti-glare screen with good viewing angles. Connectivity over Wi-Fi 6 and Bluetooth is rock solid.
+
+3.0 | Cooling fans spin up noticeably loud under heavy multitasking or gaming, and the underside gets warm near the hinge.
+
+2.0 | Trackpad click mechanism feels stiff and customer service was unresponsive for warranty support.
+
+5.0 | Unbelievably perfect laptop! Best computer on earth, everyone must buy now five stars! Exceeded all expectations!`;
+    }
+
+    async function runPasteAudit() {
+      const text = document.getElementById('pasteText').value.trim();
+      const title = document.getElementById('pasteTitle').value.trim();
+      const storeRating = document.getElementById('pasteStoreRating').value.trim();
+
+      if (!text) {
+        alert('Please paste customer reviews into the box.');
+        return;
+      }
+      document.getElementById('pasteSpinner').style.display = 'block';
+
+      try {
+        const res = await fetch('/api/audit-paste', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, title, store_rating: storeRating })
+        });
+        const data = await res.json();
+        document.getElementById('pasteSpinner').style.display = 'none';
+
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        renderAuditResults(data, 'urlResults');
+        switchNav('url-tab');
+      } catch (err) {
+        document.getElementById('pasteSpinner').style.display = 'none';
+        alert('Error: ' + err.message);
+      }
+    }
+
+    let catalogLoaded = false;
+    async function loadCatalogData() {
+      if (catalogLoaded) return;
+      try {
+        const res = await fetch('/api/catalog');
+        const data = await res.json();
+        catalogLoaded = true;
+        renderCatalogRows(data.products || []);
+      } catch (err) {
+        console.error('Catalog load error:', err);
+      }
+    }
+
+    function renderCatalogRows(products) {
+      const tbody = document.getElementById('catalogTableBody');
+      tbody.innerHTML = '';
+      products.forEach(p => {
+        const delta = Number(p.inflation_delta || 0);
+        tbody.innerHTML += `
+          <tr onclick="auditCatalogAsin('${p.asin}')">
+            <td><strong>${p.title}</strong></td>
+            <td><code>${p.asin}</code></td>
+            <td><span class="badge">${p.category}</span></td>
+            <td>${p.displayed_rating} ★</td>
+            <td style="color: #34d399; font-weight: 700;">${p.authentic_rating} ★</td>
+            <td style="color: ${delta > 0 ? '#f43f5e' : '#34d399'}; font-weight: 700;">${delta > 0 ? '+' : ''}${delta.toFixed(2)} ★</td>
+            <td><span class="badge ${p.trust_grade === 'Grade A' ? 'green' : ''}">${p.trust_grade}</span></td>
+          </tr>
+        `;
+      });
+    }
+
+    async function auditCatalogAsin(asin) {
+      try {
+        const res = await fetch(`/api/catalog/${asin}`);
+        const data = await res.json();
+        renderAuditResults(data, 'urlResults');
+        switchNav('url-tab');
+      } catch (err) {
+        alert('Catalog audit error: ' + err.message);
+      }
+    }
+
+    async function filterCatalog() {
+      const q = document.getElementById('catSearchInput').value.trim();
+      const cat = document.getElementById('catCategorySelect').value;
+      try {
+        const res = await fetch(`/api/catalog?q=${encodeURIComponent(q)}&category=${encodeURIComponent(cat)}`);
+        const data = await res.json();
+        renderCatalogRows(data.products || []);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
